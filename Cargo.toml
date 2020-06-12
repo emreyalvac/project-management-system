@@ -5,5 +5,7 @@ members = [
     "commands",
     "queries",
     "data-access",
-    "cache"
+    "cache",
+    "background_jobs",
+    "messaging"
 ]

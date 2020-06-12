@@ -1,5 +1,5 @@
 [package]
-name = "domain"
+name = "messaging"
 version = "0.1.0"
 authors = ["emreyalvac <emre.yalvac@outlook.com>"]
 edition = "2018"
@@ -7,5 +7,11 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-serde = "1.0.111"
-async-trait = "0.1.35"
+lettre = "0.10.0-alpha.1"
+lettre_email = "0.9.4"
+async-trait = "0.1.32"
+domain = {path = "./../domain"}
+
+
+[dev-dependencies]
+tokio = "0.2.21"

@@ -3,3 +3,5 @@ pub mod common;
 pub mod board;
 pub mod card;
 pub mod task;
+pub mod query;
+pub mod email;
