@@ -4,5 +4,6 @@ members = [
     "services",
     "commands",
     "queries",
-    "data-access"
+    "data-access",
+    "cache"
 ]
