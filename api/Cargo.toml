@@ -1,5 +1,5 @@
 [package]
-name = "queries"
+name = "api"
 version = "0.1.0"
 authors = ["emreyalvac <emre.yalvac@outlook.com>"]
 edition = "2018"
@@ -8,5 +8,9 @@ edition = "2018"
 
 [dependencies]
 domain = {path = "./../domain"}
-async-trait = "0.1.35"
-data-access = {path = "./../data-access"}
+background_jobs = {path = "./../background_jobs"}
+cache = {path = "./../cache"}
+actix-rt = "1.1.1"
+actix-web = "3.0.0-alpha.3"
+services = {path = "./../services"}
+futures = "0.3.5"

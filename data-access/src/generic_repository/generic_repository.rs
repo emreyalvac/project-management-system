@@ -22,7 +22,7 @@ pub struct GenericRepository {
 impl TGenericRepository for GenericRepository {
     async fn get_all<T>(&self) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send {
         let mut data: Vec<T> = Vec::new();
-        let db = self.connection.database("project_management");
+        let db = self.connection.database("test");
         let mut cursor = db.collection(self.collection.as_str()).find(None, None).await.unwrap();
         while let Some(result) = cursor.next().await {
             match result {
@@ -45,7 +45,7 @@ impl TGenericRepository for GenericRepository {
     }
 
     async fn get_by_generic<T>(&self, column: String, value: String) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send {
-        let db = self.connection.database("project_management");
+        let db = self.connection.database("test");
         let cursor = db.collection(self.collection.as_str()).find_one(bson::doc! {column: value}, None).await.unwrap();
         match cursor {
             Some(doc) => {
@@ -65,7 +65,7 @@ impl TGenericRepository for GenericRepository {
     }
 
     async fn insert_generic<T>(&self, data: &T) -> Result<bool, bool> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync {
-        let db = self.connection.database("project_management");
+        let db = self.connection.database("test");
         let bson = bson::to_bson(&data).unwrap();
         let de_reference = bson.as_document().unwrap();
         let cloned = de_reference.clone();
@@ -77,7 +77,7 @@ impl TGenericRepository for GenericRepository {
     }
 
     async fn aggregate<T>(&self, queries: Vec<bson::document::Document>) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync {
-        let db = self.connection.database("project_management");
+        let db = self.connection.database("test");
         let mut cursor = db.collection(self.collection.as_str()).aggregate(queries, None).await.unwrap();
         let mut data: Vec<T> = Vec::new();
         while let Some(result) = cursor.next().await {

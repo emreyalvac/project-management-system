@@ -7,5 +7,6 @@ members = [
     "data-access",
     "cache",
     "background_jobs",
-    "messaging"
+    "messaging",
+    "api"
 ]
