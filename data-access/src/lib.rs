@@ -24,7 +24,6 @@ impl TDatabaseConnection for DatabaseConnection {
     }
 
     async fn ping_connection(&self) -> Result<bool, bool> {
-        let connection = self.get_connection();
         match self.get_connection().await {
             Ok(connection) => {
                 let ping = connection.database("project_management").run_command(doc! {"ping": 1}, None).await;
