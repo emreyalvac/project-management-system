@@ -6,6 +6,7 @@ use domain::common::claims::Claims;
 
 static SECRET_KEY: &'static str = "d41d8cd98f00b204e9800998ecf8427e";
 
+#[derive(Debug)]
 pub struct AuthorizationService;
 
 impl FromRequest for AuthorizationService {

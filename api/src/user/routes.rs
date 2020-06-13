@@ -5,6 +5,8 @@ use domain::user::register::Register;
 use futures::executor::block_on;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker, EmailJob};
 use std::sync::{Mutex, Arc};
+use domain::user::user_get_by_id::UserGetById;
+use middlewares::auth::auth::AuthorizationService;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
@@ -33,7 +35,7 @@ async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<
             std::thread::spawn(move || {
                 let worker = email_job.lock().unwrap();
                 let validate = block_on(services.generate_token_for_validation(into));
-                let result = block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Validation Key -> {}", validate), subject: "Validation".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+                block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Validation Key -> {}", validate), subject: "Validation".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
             });
             HttpResponse::Ok().json(res)
         }
@@ -57,8 +59,23 @@ async fn validate_token(token: web::Path<String>) -> HttpResponse {
     }
 }
 
+#[post("/getBoards")]
+async fn get_user_boards(user: web::Json<UserGetById>, _: AuthorizationService) -> HttpResponse {
+    let services = UserServices {};
+    let result = services.get_user_boards(user.into_inner()).await;
+    match result {
+        Ok(data) => {
+            HttpResponse::Ok().json(data)
+        }
+        Err(e) => {
+            HttpResponse::Ok().json(e)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(register);
     cfg.service(validate_token);
+    cfg.service(get_user_boards);
 }

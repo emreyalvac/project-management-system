@@ -21,6 +21,10 @@ use uuid::Uuid;
 use domain::user::validate_user::ValidateUserClaims;
 use commands::commands::user_commands::validate_user_command::ValidateUserCommand;
 use domain::query::query::TQueryHandler;
+use domain::user::user_get_by_id::UserGetById;
+use domain::board::board::Board;
+use queries::queries::user_queries::get_user_boards_aggregate_query::GetUserBoardsAggregateQuery;
+use domain::aggregates::board_user_aggregate::BoardUserAggregate;
 
 #[async_trait]
 pub trait TUserServices {
@@ -29,6 +33,7 @@ pub trait TUserServices {
     async fn register(&self, mut register: Register) -> Result<CommandResponse, CommandResponse>;
     async fn generate_token_for_validation(&self, user: Register) -> String;
     async fn validate_user(&self, token: String) -> Result<CommandResponse, CommandResponse>;
+    async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate>;
 }
 
 pub struct UserServices {}
@@ -135,6 +140,16 @@ impl TUserServices for UserServices {
             Ok(execute)
         } else {
             Err(execute)
+        }
+    }
+
+    async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate> {
+        let factory = UserQueryHandlerFactory {};
+        let handler = factory.build_for_boards(GetUserBoardsAggregateQuery { user_id: user.user_id }).await;
+        let result = handler.get().await;
+        match result {
+            Ok(data) => Ok(data),
+            Err(e) => Ok(e)
         }
     }
 }

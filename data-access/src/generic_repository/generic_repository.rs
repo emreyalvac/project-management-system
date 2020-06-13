@@ -122,12 +122,16 @@ impl TGenericRepository for GenericRepository {
                                     data = Some(result);
                                     break;
                                 }
-                                Err(_) => {
+                                Err(err) => {
+                                    println!("Aggregate One Encode Error -> {:?}", err);
                                     return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
                                 }
                             }
                         }
-                        Err(_) => return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News })
+                        Err(err) => {
+                            println!("Err {:?}", err);
+                            return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
+                        }
                     }
                 }
             }
