@@ -25,7 +25,7 @@ impl TQueryHandler<GetBoardAsAggregateQuery, BoardAggregate, NotFound> for GetBo
         let query_5 = doc! {"$group" => {"_id": "$_id", "board" => {"$first" => {"board_id": "$board_id", "board_name": "$board_name", "board_manager_user_id": "$board_manager_user_id"}}, "cards" => {"$addToSet" => {"card_id": "$cards.card_id", "card_name": "$cards.card_name", "tasks": "$tasks"}}}};
         let query = repository.aggregate_one::<BoardAggregate>(vec![query_1, query_2, query_3, query_4, query_5]).await;
         match query {
-            Ok(mut result) => {
+            Ok(result) => {
                 Ok(result)
             }
             Err(err) => {
