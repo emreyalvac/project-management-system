@@ -8,5 +8,6 @@ members = [
     "cache",
     "background_jobs",
     "messaging",
-    "api"
+    "api",
+    "middlewares"
 ]

@@ -1,5 +1,5 @@
 [package]
-name = "api"
+name = "middlewares"
 version = "0.1.0"
 authors = ["emreyalvac <emre.yalvac@outlook.com>"]
 edition = "2018"
@@ -7,11 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-domain = {path = "./../domain"}
-background_jobs = {path = "./../background_jobs"}
-middlewares = {path = "./../middlewares"}
-cache = {path = "./../cache"}
-services = {path = "./../services"}
-actix-rt = "1.1.1"
 actix-web = "3.0.0-alpha.3"
 futures = "0.3.5"
+jsonwebtoken = "7.1.1"
+domain = {path = "./../domain"}

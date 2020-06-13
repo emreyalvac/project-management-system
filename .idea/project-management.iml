@@ -11,6 +11,7 @@
       <sourceFolder url="file://$MODULE_DIR$/background_jobs/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/messaging/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/api/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/middlewares/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />

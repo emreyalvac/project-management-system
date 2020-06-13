@@ -122,8 +122,7 @@ impl TGenericRepository for GenericRepository {
                                     data = Some(result);
                                     break;
                                 }
-                                Err(e) => {
-                                    println!("{:?}", e);
+                                Err(_) => {
                                     return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
                                 }
                             }
