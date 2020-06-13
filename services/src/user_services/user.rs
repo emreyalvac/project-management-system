@@ -25,6 +25,10 @@ use domain::user::user_get_by_id::UserGetById;
 use domain::board::board::Board;
 use queries::queries::user_queries::get_user_boards_aggregate_query::GetUserBoardsAggregateQuery;
 use domain::aggregates::board_user_aggregate::BoardUserAggregate;
+use domain::user::insert_board_to_user::InsertBoardToUser;
+use commands::commands::user_commands::insert_board_to_user_command::InsertBoardToUserCommand;
+use crate::board_services::board::{BoardServices, TBoardServices};
+use domain::board::insertable_board::InsertableBoard;
 
 #[async_trait]
 pub trait TUserServices {
@@ -34,6 +38,7 @@ pub trait TUserServices {
     async fn generate_token_for_validation(&self, user: Register) -> String;
     async fn validate_user(&self, token: String) -> Result<CommandResponse, CommandResponse>;
     async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate>;
+    async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse>;
 }
 
 pub struct UserServices {}
@@ -150,6 +155,27 @@ impl TUserServices for UserServices {
         match result {
             Ok(data) => Ok(data),
             Err(e) => Ok(e)
+        }
+    }
+
+    async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse> {
+        let factory = UserCommandHandlerFactory {};
+        let board_service = BoardServices {};
+        let cloned_board = board.clone();
+        let insert_board = board.clone();
+        let board = InsertableBoard {
+            board_id: insert_board.board_id,
+            board_cards: insert_board.board_cards,
+            board_name: insert_board.board_name,
+            board_manager_user_id: insert_board.user_id,
+        };
+        let board_execute = board_service.insert_board(board).await;
+        let mut handler = factory.build_for_insert_board(InsertBoardToUserCommand { user_board: cloned_board });
+        let result = handler.execute().await;
+        if result.status {
+            Ok(result)
+        } else {
+            Err(result)
         }
     }
 }

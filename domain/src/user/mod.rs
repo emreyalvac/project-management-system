@@ -5,3 +5,4 @@ pub mod register;
 pub mod user;
 pub mod validate_user;
 pub mod user_get_by_id;
+pub mod insert_board_to_user;

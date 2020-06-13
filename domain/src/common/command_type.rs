@@ -5,4 +5,6 @@ pub enum CommandType {
     BoardInsert,
     UserInsert,
     ValidateUser,
+    InsertBoardToUser,
+    InsertBoard,
 }

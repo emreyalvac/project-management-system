@@ -7,6 +7,7 @@ use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker, Ema
 use std::sync::{Mutex, Arc};
 use domain::user::user_get_by_id::UserGetById;
 use middlewares::auth::auth::AuthorizationService;
+use domain::user::insert_board_to_user::InsertBoardToUser;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
@@ -73,9 +74,24 @@ async fn get_user_boards(user: web::Json<UserGetById>, _: AuthorizationService) 
     }
 }
 
+#[post("/createBoard")]
+async fn insert_board_to_user(board: web::Json<InsertBoardToUser>) -> HttpResponse {
+    let services = UserServices {};
+    let result = services.insert_board(board.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(register);
     cfg.service(validate_token);
     cfg.service(get_user_boards);
+    cfg.service(insert_board_to_user);
 }
