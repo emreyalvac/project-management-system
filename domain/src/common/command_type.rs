@@ -7,4 +7,5 @@ pub enum CommandType {
     ValidateUser,
     InsertBoardToUser,
     InsertBoard,
+    InsertCard
 }
