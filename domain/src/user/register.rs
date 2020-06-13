@@ -14,4 +14,6 @@ pub struct Register {
     pub password: String,
     #[serde(default)]
     pub is_validate: bool,
+    #[serde(default)]
+    pub user_boards: Vec<String>,
 }

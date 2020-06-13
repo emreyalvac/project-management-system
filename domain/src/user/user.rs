@@ -10,4 +10,6 @@ pub struct User {
     pub password: String,
     #[serde(default, skip_serializing)]
     pub is_validate: bool,
+    #[serde(default)]
+    pub user_boards: Vec<String>,
 }

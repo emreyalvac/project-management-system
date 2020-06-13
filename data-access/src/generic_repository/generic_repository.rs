@@ -7,6 +7,7 @@ use futures::stream::StreamExt;
 use bson::{doc, Document};
 use serde::{Serialize};
 use bson::ordered::OrderedDocument;
+use std::fmt::Debug;
 
 // TODO: Add aggregate_one function
 
@@ -16,6 +17,7 @@ pub trait TGenericRepository {
     async fn get_by_generic<T>(&self, column: String, value: String) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send;
     async fn insert_generic<T>(&self, data: &T) -> Result<bool, bool> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync;
     async fn aggregate<T>(&self, queries: Vec<bson::ordered::OrderedDocument>) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync;
+    async fn aggregate_one<T>(&self, queries: Vec<bson::ordered::OrderedDocument>) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync + Debug;
     async fn update(&self, filter: OrderedDocument, data: OrderedDocument) -> Result<bool, bool>;
 }
 
@@ -104,6 +106,38 @@ impl TGenericRepository for GenericRepository {
             }
         }
         data
+    }
+
+    async fn aggregate_one<T>(&self, queries: Vec<OrderedDocument>) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync + Debug {
+        let db = self.connection.database("project_management");
+        let mut cursor = db.collection(self.collection.as_str()).aggregate(queries, None).await;
+        let mut data: Option<T> = None;
+        match cursor {
+            Ok(mut result) => {
+                while let Some(doc) = result.next().await {
+                    match doc {
+                        Ok(res) => {
+                            match bson::from_bson(bson::Bson::Document(res)) {
+                                Ok(result) => {
+                                    data = Some(result);
+                                    break;
+                                }
+                                Err(e) => {
+                                    println!("{:?}", e);
+                                    return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
+                                }
+                            }
+                        }
+                        Err(_) => return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News })
+                    }
+                }
+            }
+            Err(_) => return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News })
+        }
+        match data {
+            Some(result) => Ok(result),
+            None => Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News }),
+        }
     }
 
     async fn update(&self, filter: OrderedDocument, data: OrderedDocument) -> Result<bool, bool> {

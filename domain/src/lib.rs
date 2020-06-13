@@ -7,3 +7,4 @@ pub mod query;
 pub mod email;
 pub mod command;
 pub mod user;
+pub mod aggregates;

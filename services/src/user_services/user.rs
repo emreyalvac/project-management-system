@@ -39,7 +39,7 @@ static SECRET_KEY: &'static str = "d41d8cd98f00b204e9800998ecf8427e";
 impl TUserServices for UserServices {
     async fn get_by_email(&self, user: GetByEmail) -> Result<User, NotFound> {
         let factory = UserQueryHandlerFactory {};
-        let query = factory.build_for_email(UserGetByEmailQuery { email: user.email });
+        let query = factory.build_for_email(UserGetByEmailQuery { email: user.email }).await;
         let result = query.get().await;
         match result {
             Ok(user) => {
@@ -71,7 +71,7 @@ impl TUserServices for UserServices {
                     };
                     let token = encode(&Header::default(), &my_claims, &EncodingKey::from_secret(key)).unwrap();
                     if !user.is_validate {
-                        return Err(LoginResponse { status: false, token: Default::default(), message: "Check your information.".to_owned() });
+                        return Err(LoginResponse { status: false, token: Default::default(), message: "User found but could not be verified".to_owned() });
                     }
                     Ok(LoginResponse { token, status: true, message: "OK".to_owned() })
                 } else {

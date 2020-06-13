@@ -8,6 +8,7 @@ use std::sync::{Mutex, Arc};
 
 // Mod
 mod user;
+mod board;
 
 // Email Worker
 async fn email_worker_process() {
@@ -44,6 +45,7 @@ async fn main() -> Result<()> {
         App::new()
             // Boards
             .service(web::scope("/user").configure(user::routes::init_routes))
+            .service(web::scope("/board").configure(board::routes::init_routes))
             // Pass App Data
             .app_data(email_worker.clone())
             // Pass Redis Pool
