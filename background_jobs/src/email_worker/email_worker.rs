@@ -8,7 +8,7 @@ use domain::email::email::EmailSend;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct EmailJob {
     pub class: String,
-    pub email: String,
+    pub to: String,
     pub iterate: i32,
     pub message: String,
     pub subject: String,
@@ -56,7 +56,7 @@ impl TEmailWorker for EmailWorker {
         let mut redis_connection = redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
         let email = Email {};
         let mut job = serde_json::from_str::<EmailJob>(json_job.as_str()).unwrap();
-        let send = email.send_email(EmailSend { from: "rusttestemail12@gmail.com".to_owned(), to: (&job.email).parse().unwrap(), body: (&job.message).parse().unwrap(), subject: (&job.subject).parse().unwrap() }).await;
+        let send = email.send_email(EmailSend { from: "rusttestemail12@gmail.com".to_owned(), to: (&job.to).parse().unwrap(), body: (&job.message).parse().unwrap(), subject: (&job.subject).parse().unwrap() }).await;
         match send {
             Ok(_) => {
                 println!("Job Completed {:?} and deleted", json_job);

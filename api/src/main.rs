@@ -7,7 +7,7 @@ use cache::redis::redis::Redis;
 use std::sync::{Mutex, Arc};
 
 // Mod
-mod board;
+mod user;
 
 // Email Worker
 async fn email_worker_process() {
@@ -42,7 +42,8 @@ async fn main() -> Result<()> {
 
     HttpServer::new(move || {
         App::new()
-            .service(web::scope("/boards").configure(board::routes::init_routes))
+            // Boards
+            .service(web::scope("/user").configure(user::routes::init_routes))
             // Pass App Data
             .app_data(email_worker.clone())
             // Pass Redis Pool

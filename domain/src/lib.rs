@@ -5,3 +5,5 @@ pub mod card;
 pub mod task;
 pub mod query;
 pub mod email;
+pub mod command;
+pub mod user;

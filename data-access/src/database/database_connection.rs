@@ -1,6 +1,7 @@
-use mongodb::{Client, bson::doc};
+use mongodb::{Client};
 use async_trait::async_trait;
 use domain::database::database_exceptions::DatabaseException;
+use bson::doc;
 
 #[async_trait]
 pub trait TDatabaseConnection {
