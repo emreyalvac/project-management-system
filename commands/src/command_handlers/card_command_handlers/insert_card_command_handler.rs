@@ -4,8 +4,8 @@ use domain::common::command_response::CommandResponse;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use domain::card::insert_card::InsertCard;
 use async_trait::async_trait;
+use domain::board::insert_card_to_board::InsertCardToBoard;
 
 pub struct InsertCardCommandHandler {
     pub command: InsertCardCommand
@@ -20,7 +20,7 @@ impl TCommandHandler<InsertCardCommand, CommandResponse> for InsertCardCommandHa
             Ok(client) => {
                 let repository = GenericRepository { connection: client, collection: "cards".to_owned() };
                 let card = self.command.card.clone();
-                let handler = repository.insert_generic::<InsertCard>(&card).await;
+                let handler = repository.insert_generic::<InsertCardToBoard>(&card).await;
                 drop(card);
                 match handler {
                     Ok(_) => {

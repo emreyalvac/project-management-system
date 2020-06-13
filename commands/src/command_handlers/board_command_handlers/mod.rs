@@ -1,1 +1,2 @@
 pub mod insert_board_command_handler;
+pub mod insert_card_to_board_command_handler;

@@ -2,8 +2,8 @@ use actix_web::{get, post, web, HttpResponse};
 use services::board_services::board::{BoardServices, TBoardServices};
 use domain::board::board_get_with_id::BoardGetWithId;
 use middlewares::auth::auth::AuthorizationService;
-use domain::card::insert_card::InsertCard;
 use services::card_services::card::{CardServices, TCardServices};
+use domain::board::insert_card_to_board::InsertCardToBoard;
 
 #[get("/{id}")]
 async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
@@ -16,9 +16,9 @@ async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpRespo
 }
 
 #[post("/createCard")]
-async fn board_create_card(card: web::Json<InsertCard>) -> HttpResponse {
-    let services = CardServices {};
-    let result = services.insert_card(card.into_inner()).await;
+async fn board_create_card(card: web::Json<InsertCardToBoard>) -> HttpResponse {
+    let board_services = BoardServices {};
+    let result = board_services.insert_card_to_board(card.into_inner()).await;
     match result {
         Ok(res) => {
             HttpResponse::Ok().json(res)
