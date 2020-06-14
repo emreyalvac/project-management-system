@@ -5,6 +5,7 @@ use std::time::Duration;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker};
 use cache::redis::redis::Redis;
 use std::sync::{Mutex, Arc};
+use actix_cors::Cors;
 
 // Mod
 mod user;
@@ -50,6 +51,7 @@ async fn main() -> Result<()> {
             .app_data(email_worker.clone())
             // Pass Redis Pool
             .app_data(redis_pool.clone())
+            .wrap(Cors::new().supports_credentials().finish())
     })
         .keep_alive(Some(75))
         .bind("127.0.0.1:5004")?

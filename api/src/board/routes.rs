@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse, HttpRequest};
 use services::board_services::board::{BoardServices, TBoardServices};
 use domain::board::board_get_with_id::BoardGetWithId;
 use middlewares::auth::auth::AuthorizationService;
@@ -6,7 +6,7 @@ use services::card_services::card::{CardServices, TCardServices};
 use domain::board::insert_card_to_board::InsertCardToBoard;
 
 #[get("/{id}")]
-async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
+async fn get_boards(id: web::Path<String>, _: AuthorizationService, req: HttpRequest) -> HttpResponse {
     let services = BoardServices {};
     let result = services.get_board_as_aggregate(BoardGetWithId { board_id: id.into_inner() }).await;
     match result {

@@ -20,7 +20,6 @@ impl TCommandHandler<InsertCardToBoardCommand, CommandResponse> for InsertCardTo
             Ok(client) => {
                 let repository = GenericRepository { collection: "boards".to_owned(), connection: client };
                 let board_id = self.command.card.board_id.clone();
-                println!("{:?}", board_id);
                 let card_id = self.command.card.card_id.clone();
                 let execute = repository.update(doc! {"board_id": board_id}, doc! {"$push" => {"board_cards": card_id}}).await;
                 match execute {

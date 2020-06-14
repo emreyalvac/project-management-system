@@ -48,11 +48,12 @@ impl TBoardServices for BoardServices {
 
     async fn insert_card_to_board(&self, card: InsertCardToBoard) -> Result<CommandResponse, CommandResponse> {
         let factory = BoardCommandHandlerFactory {};
-        let card_services = CardServices {};
-        let card_insert_result = card_services.insert_card(card.clone()).await;
+        let card_clone = card.clone();
         let mut handler = factory.build_for_insert_card_to_board(InsertCardToBoardCommand { card });
         let result = handler.execute().await;
         if result.status {
+            let card_services = CardServices {};
+            let card_insert_result = card_services.insert_card(card_clone).await;
             Ok(result)
         } else {
             Err(result)

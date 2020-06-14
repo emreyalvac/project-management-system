@@ -14,4 +14,5 @@ cache = {path = "./../cache"}
 services = {path = "./../services"}
 actix-rt = "1.1.1"
 actix-web = "3.0.0-alpha.3"
+actix-cors = "0.3.0-alpha.1"
 futures = "0.3.5"
