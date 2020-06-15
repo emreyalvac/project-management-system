@@ -12,6 +12,7 @@ background_jobs = {path = "./../background_jobs"}
 middlewares = {path = "./../middlewares"}
 cache = {path = "./../cache"}
 services = {path = "./../services"}
+helpers = {path = "./../helpers"}
 actix-rt = "1.1.1"
 actix-web = "3.0.0-alpha.3"
 actix-cors = "0.3.0-alpha.1"

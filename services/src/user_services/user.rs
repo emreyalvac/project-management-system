@@ -76,7 +76,7 @@ impl TUserServices for UserServices {
                         date = Utc::now() + Duration::hours(1)
                     }
                     let my_claims = Claims {
-                        sub: user.email,
+                        sub: user.id,
                         exp: date.timestamp() as usize,
                     };
                     let token = encode(&Header::default(), &my_claims, &EncodingKey::from_secret(key)).unwrap();

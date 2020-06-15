@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, post, web, HttpResponse, HttpRequest};
 use services::user_services::user::{UserServices, TUserServices};
 use domain::user::login_user::LoginUser;
 use domain::user::register::Register;
@@ -8,6 +8,8 @@ use std::sync::{Mutex, Arc};
 use domain::user::user_get_by_id::UserGetById;
 use middlewares::auth::auth::AuthorizationService;
 use domain::user::insert_board_to_user::InsertBoardToUser;
+use helpers::token_decoder::token_decoder;
+use domain::common::claims::Claims;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
@@ -61,9 +63,12 @@ async fn validate_token(token: web::Path<String>) -> HttpResponse {
 }
 
 #[post("/getBoards")]
-async fn get_user_boards(user: web::Json<UserGetById>, _: AuthorizationService) -> HttpResponse {
+async fn get_user_boards(_: AuthorizationService, req: HttpRequest) -> HttpResponse {
+    let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
+    let result = token_decoder::<Claims>(header);
+    let user = result.unwrap().sub;
     let services = UserServices {};
-    let result = services.get_user_boards(user.into_inner()).await;
+    let result = services.get_user_boards(UserGetById { user_id: user }).await;
     match result {
         Ok(data) => {
             HttpResponse::Ok().json(data)
@@ -75,7 +80,12 @@ async fn get_user_boards(user: web::Json<UserGetById>, _: AuthorizationService) 
 }
 
 #[post("/createBoard")]
-async fn insert_board_to_user(board: web::Json<InsertBoardToUser>) -> HttpResponse {
+async fn insert_board_to_user(_: AuthorizationService, mut board: web::Json<InsertBoardToUser>, req: HttpRequest) -> HttpResponse {
+    let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
+    let result = token_decoder::<Claims>(header);
+    let user = result.unwrap().sub;
+    board.user_id = (&user).parse().unwrap();
+    board.board_manager_user_id = user;
     let services = UserServices {};
     let result = services.insert_board(board.into_inner()).await;
     match result {

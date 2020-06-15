@@ -26,7 +26,7 @@ impl FromRequest for AuthorizationService {
                     &DecodingKey::from_secret(key),
                     &Validation::new(Algorithm::HS256),
                 ) {
-                    Ok(_token) => ok(AuthorizationService),
+                    Ok(token) => ok(AuthorizationService),
                     Err(_e) => err(ErrorUnauthorized("invalid token!")),
                 }
             }
