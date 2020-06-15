@@ -6,7 +6,7 @@ use services::card_services::card::{CardServices, TCardServices};
 use domain::board::insert_card_to_board::InsertCardToBoard;
 
 #[get("/{id}")]
-async fn get_boards(id: web::Path<String>, _: AuthorizationService, req: HttpRequest) -> HttpResponse {
+async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
     let services = BoardServices {};
     let result = services.get_board_as_aggregate(BoardGetWithId { board_id: id.into_inner() }).await;
     match result {
@@ -16,7 +16,7 @@ async fn get_boards(id: web::Path<String>, _: AuthorizationService, req: HttpReq
 }
 
 #[post("/createCard")]
-async fn board_create_card(card: web::Json<InsertCardToBoard>) -> HttpResponse {
+async fn board_create_card(card: web::Json<InsertCardToBoard>, _: AuthorizationService) -> HttpResponse {
     let board_services = BoardServices {};
     let result = board_services.insert_card_to_board(card.into_inner()).await;
     match result {
