@@ -8,5 +8,6 @@ pub enum CommandType {
     InsertBoardToUser,
     InsertBoard,
     InsertCard,
-    InsertCardToBoard
+    InsertCardToBoard,
+    InsertTaskToCard
 }
