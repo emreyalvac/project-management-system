@@ -5,7 +5,7 @@ fn id_generator() -> String {
     Uuid::new_v4().to_string()
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone)]
 pub struct InsertTask {
     #[serde(skip_serializing)]
     pub card_id: String,

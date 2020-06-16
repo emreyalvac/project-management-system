@@ -5,6 +5,8 @@ use commands::commands::card_commands::insert_card_command::InsertCardCommand;
 use domain::command::command::TCommandHandler;
 use domain::board::insert_card_to_board::InsertCardToBoard;
 use domain::card::insert_task_to_card::InsertTask;
+use crate::task_services::task::{TaskServices, TTaskServices};
+use commands::commands::card_commands::insert_task_to_card_command::InsertTaskToCardCommand;
 
 #[async_trait]
 pub trait TCardServices {
@@ -28,6 +30,16 @@ impl TCardServices for CardServices {
     }
 
     async fn insert_task_to_card(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse> {
-        unimplemented!()
+        let card_task = task.clone();
+        let task_services = TaskServices {};
+        let task_insert = task_services.insert_task(task).await;
+        let factory = CardCommandHandlerFactory {};
+        let mut handler = factory.build_for_insert_task_to_card(InsertTaskToCardCommand { task: card_task });
+        let result = handler.execute().await;
+        if result.status {
+            Ok(result)
+        } else {
+            Err(result)
+        }
     }
 }
