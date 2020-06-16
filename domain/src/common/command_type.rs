@@ -9,5 +9,6 @@ pub enum CommandType {
     InsertBoard,
     InsertCard,
     InsertCardToBoard,
-    InsertTaskToCard
+    InsertTaskToCard,
+    MoveTaskToAnotherCard
 }
