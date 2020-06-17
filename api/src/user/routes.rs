@@ -98,10 +98,28 @@ async fn insert_board_to_user(_: AuthorizationService, mut board: web::Json<Inse
     }
 }
 
+#[get("/getUserInformations")]
+async fn get_user_informations(_: AuthorizationService, req: HttpRequest) -> HttpResponse {
+    let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
+    let result = token_decoder::<Claims>(header);
+    let user = result.unwrap().sub;
+    let services = UserServices {};
+    let result = services.get_by_id(UserGetById { user_id: user }).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::NotFound().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(register);
     cfg.service(validate_token);
     cfg.service(get_user_boards);
     cfg.service(insert_board_to_user);
+    cfg.service(get_user_informations);
 }

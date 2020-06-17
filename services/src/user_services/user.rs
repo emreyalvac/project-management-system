@@ -29,6 +29,7 @@ use domain::user::insert_board_to_user::InsertBoardToUser;
 use commands::commands::user_commands::insert_board_to_user_command::InsertBoardToUserCommand;
 use crate::board_services::board::{BoardServices, TBoardServices};
 use domain::board::insertable_board::InsertableBoard;
+use queries::queries::user_queries::user_get_by_id_query::UserGetByIdQuery;
 
 #[async_trait]
 pub trait TUserServices {
@@ -39,6 +40,7 @@ pub trait TUserServices {
     async fn validate_user(&self, token: String) -> Result<CommandResponse, CommandResponse>;
     async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate>;
     async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse>;
+    async fn get_by_id(&self, user: UserGetById) -> Result<User, NotFound>;
 }
 
 pub struct UserServices {}
@@ -176,6 +178,20 @@ impl TUserServices for UserServices {
             Ok(result)
         } else {
             Err(result)
+        }
+    }
+
+    async fn get_by_id(&self, user: UserGetById) -> Result<User, NotFound> {
+        let factory = UserQueryHandlerFactory {};
+        let mut handler = factory.build_for_get_by_id(UserGetByIdQuery { id: user.user_id }).await;
+        let result = handler.get().await;
+        match result {
+            Ok(user) => {
+                Ok(user)
+            }
+            Err(err) => {
+                Err(err)
+            }
         }
     }
 }
