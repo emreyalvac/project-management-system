@@ -10,6 +10,8 @@ pub struct Register {
     #[serde(default = "id_generator")]
     pub id: String,
     pub email: String,
+    pub name: String,
+    pub surname: String,
     pub user_name: String,
     pub password: String,
     #[serde(default)]

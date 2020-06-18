@@ -1,5 +1,6 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
+use crate::task::task_status::TaskStatus;
 
 fn id_generator() -> String {
     Uuid::new_v4().to_string()
@@ -16,4 +17,6 @@ pub struct InsertTask {
     pub task_end_date: String,
     pub task_assigned_users: Vec<String>,
     pub task_description: String,
+    #[serde(default = "TaskStatus::default_status")]
+    pub task_status: TaskStatus
 }
