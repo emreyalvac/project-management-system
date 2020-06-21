@@ -18,7 +18,7 @@ impl TQueryHandler<GetBoardAsAggregateQuery, BoardAggregate, NotFound> for GetBo
         let database = DatabaseConnection {};
         let connection = database.get_connection().await.ok().unwrap();
         let repository: GenericRepository = GenericRepository { collection: "boards".to_owned(), connection };
-        let board_id = self.query.board_id.clone();
+        let board_id = &self.query.board_id;
         let query_1 = doc! {"$match" => {"board_id": board_id.as_str()}};
         let query_2 = doc! {"$lookup" => {"from": "cards", "localField": "board_cards", "foreignField": "card_id", "as": "cards"}};
         let query_3 = doc! {"$unwind" => {"path": "$cards", "preserveNullAndEmptyArrays": true}};

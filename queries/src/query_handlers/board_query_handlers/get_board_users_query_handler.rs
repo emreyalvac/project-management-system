@@ -17,7 +17,7 @@ impl TQueryHandler<GetBoardUsersQuery, BoardUsersAggregate, NotFound> for GetBoa
         let database = DatabaseConnection {};
         let connection = database.get_connection().await.ok().unwrap();
         let repository = GenericRepository { collection: "boards".to_owned(), connection };
-        let board_id = self.query.board_id.clone();
+        let board_id = &self.query.board_id;
         let match_query = doc! {"$match" => {"board_id": board_id}};
         let lookup_query = doc! {"$lookup" => {"from": "users", "localField": "board_id", "foreignField": "user_boards", "as": "users"}};
         let unwind_query = doc! {"$unwind": "$users"};
