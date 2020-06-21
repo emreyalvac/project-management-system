@@ -124,22 +124,22 @@ impl TGenericRepository for GenericRepository {
                                 }
                                 Err(err) => {
                                     println!("Aggregate One Encode Error -> {:?}", err);
-                                    return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
+                                    return Err(NotFound { message: "Decoder Error".to_owned(), found_type: FoundType::News });
                                 }
                             }
                         }
                         Err(err) => {
                             println!("Err {:?}", err);
-                            return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News });
+                            return Err(NotFound { message: "Not found _1".to_owned(), found_type: FoundType::News });
                         }
                     }
                 }
             }
-            Err(_) => return Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News })
+            Err(_) => return Err(NotFound { message: "Not found _2".to_owned(), found_type: FoundType::News })
         }
         match data {
             Some(result) => Ok(result),
-            None => Err(NotFound { message: "Not found".to_owned(), found_type: FoundType::News }),
+            None => Err(NotFound { message: "Not found _3".to_owned(), found_type: FoundType::News }),
         }
     }
 

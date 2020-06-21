@@ -59,9 +59,24 @@ async fn move_task_to_another_card(task: web::Json<MoveTaskToAnotherCard>, _: Au
     }
 }
 
+#[post("/getBoardUsers")]
+async fn get_board_users(_: AuthorizationService, board: web::Json<BoardGetWithId>) -> HttpResponse {
+    let services = BoardServices {};
+    let result = services.get_board_users(board.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_boards);
     cfg.service(board_create_card);
     cfg.service(insert_task_to_card);
     cfg.service(move_task_to_another_card);
+    cfg.service(get_board_users);
 }

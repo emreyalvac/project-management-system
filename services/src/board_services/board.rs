@@ -13,12 +13,15 @@ use domain::command::command::TCommandHandler;
 use domain::board::insert_card_to_board::InsertCardToBoard;
 use commands::commands::board_commands::insert_card_to_board_command::InsertCardToBoardCommand;
 use crate::card_services::card::{CardServices, TCardServices};
+use domain::board::board_users_aggregate::BoardUsersAggregate;
+use queries::queries::board_queries::get_board_users_query::GetBoardUsersQuery;
 
 #[async_trait]
 pub trait TBoardServices {
     async fn get_board_as_aggregate(&self, board: BoardGetWithId) -> Result<BoardAggregate, NotFound>;
     async fn insert_board(&self, board: InsertableBoard) -> Result<CommandResponse, CommandResponse>;
     async fn insert_card_to_board(&self, card: InsertCardToBoard) -> Result<CommandResponse, CommandResponse>;
+    async fn get_board_users(&self, board: BoardGetWithId) -> Result<BoardUsersAggregate, NotFound>;
 }
 
 pub struct BoardServices {}
@@ -57,6 +60,20 @@ impl TBoardServices for BoardServices {
             Ok(result)
         } else {
             Err(result)
+        }
+    }
+
+    async fn get_board_users(&self, board: BoardGetWithId) -> Result<BoardUsersAggregate, NotFound> {
+        let factory = BoardQueryHandlerFactory {};
+        let mut handler = factory.build_for_get_board_users(GetBoardUsersQuery { board_id: board.board_id }).await;
+        let result = handler.get().await;
+        match result {
+            Ok(res) => {
+                Ok(res)
+            }
+            Err(err) => {
+                Err(err)
+            }
         }
     }
 }
