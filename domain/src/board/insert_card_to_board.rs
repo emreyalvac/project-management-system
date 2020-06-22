@@ -1,5 +1,6 @@
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
+use crate::card::card_status::CardStatus;
 
 fn id_generator() -> String {
     Uuid::new_v4().to_string()
@@ -14,4 +15,6 @@ pub struct InsertCardToBoard {
     pub card_name: String,
     #[serde(default)]
     pub card_tasks: Vec<String>,
+    #[serde(default)]
+    pub card_status: CardStatus,
 }
