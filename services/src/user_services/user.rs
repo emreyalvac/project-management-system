@@ -30,6 +30,7 @@ use commands::commands::user_commands::insert_board_to_user_command::InsertBoard
 use crate::board_services::board::{BoardServices, TBoardServices};
 use domain::board::insertable_board::InsertableBoard;
 use queries::queries::user_queries::user_get_by_id_query::UserGetByIdQuery;
+use domain::board::board_status::BoardStatus;
 
 #[async_trait]
 pub trait TUserServices {
@@ -170,6 +171,7 @@ impl TUserServices for UserServices {
             board_cards: insert_board.board_cards,
             board_name: insert_board.board_name,
             board_manager_user_id: insert_board.user_id,
+            board_status: BoardStatus::InProgress,
         };
         let board_execute = board_service.insert_board(board).await;
         let mut handler = factory.build_for_insert_board(InsertBoardToUserCommand { user_board: cloned_board });
