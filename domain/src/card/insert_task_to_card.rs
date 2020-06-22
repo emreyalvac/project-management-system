@@ -15,8 +15,9 @@ pub struct InsertTask {
     pub task_name: String,
     pub task_start_date: String,
     pub task_end_date: String,
+    #[serde(default)]
     pub task_assigned_users: Vec<String>,
     pub task_description: String,
     #[serde(default = "TaskStatus::default_status")]
-    pub task_status: TaskStatus
+    pub task_status: TaskStatus,
 }

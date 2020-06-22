@@ -6,5 +6,5 @@ pub struct Board {
     pub board_id: String,
     pub board_name: String,
     pub board_manager_user_id: String,
-    pub board_status: BoardStatus
+    pub board_status: BoardStatus,
 }

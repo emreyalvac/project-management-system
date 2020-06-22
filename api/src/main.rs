@@ -54,7 +54,7 @@ async fn main() -> Result<()> {
             .wrap(Cors::new().supports_credentials().finish())
     })
         .keep_alive(Some(75))
-        .bind("127.0.0.1:5004")?
+        .bind("192.168.5.111:5004").unwrap()
         .run()
         .await
 }
