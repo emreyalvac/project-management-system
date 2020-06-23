@@ -9,6 +9,7 @@ use domain::card::move_task_to_another_card::MoveTaskToAnotherCard;
 use domain::card::update_card::UpdateCard;
 use domain::task::update_task::UpdateTask;
 use services::task_services::task::{TaskServices, TTaskServices};
+use domain::task::delete_task::DeleteTask;
 
 #[get("/{id}")]
 async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
@@ -104,6 +105,20 @@ async fn update_task(_: AuthorizationService, task: web::Json<UpdateTask>) -> Ht
     }
 }
 
+#[post("/task/deleteTask")]
+async fn delete_task(_: AuthorizationService, task: web::Json<DeleteTask>) -> HttpResponse {
+    let services = TaskServices {};
+    let result = services.delete_task(task.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_boards);
     cfg.service(board_create_card);
@@ -112,4 +127,5 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_board_users);
     cfg.service(update_card);
     cfg.service(update_task);
+    cfg.service(delete_task);
 }
