@@ -19,6 +19,7 @@ pub trait TGenericRepository {
     async fn aggregate<T>(&self, queries: Vec<bson::ordered::OrderedDocument>) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync;
     async fn aggregate_one<T>(&self, queries: Vec<bson::ordered::OrderedDocument>) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync + Debug;
     async fn update(&self, filter: OrderedDocument, data: OrderedDocument) -> Result<bool, bool>;
+    async fn delete_one(&self, filter: OrderedDocument) -> Result<bool, bool>;
 }
 
 pub struct GenericRepository {
@@ -154,5 +155,18 @@ impl TGenericRepository for GenericRepository {
                 Err(false)
             }
         };
+    }
+
+    async fn delete_one(&self, filter: OrderedDocument) -> Result<bool, bool> {
+        let db = self.connection.database("project_management");
+        let mut cursor = db.collection(self.collection.as_str()).delete_one(filter, None).await;
+        match cursor {
+            Ok(_) => {
+                Ok(true)
+            },
+            Err(_) => {
+                Err(false)
+            }
+        }
     }
 }
