@@ -6,6 +6,7 @@ use services::card_services::card::{CardServices, TCardServices};
 use domain::board::insert_card_to_board::InsertCardToBoard;
 use domain::card::insert_task_to_card::InsertTask;
 use domain::card::move_task_to_another_card::MoveTaskToAnotherCard;
+use domain::card::update_card::UpdateCard;
 
 #[get("/{id}")]
 async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
@@ -73,10 +74,25 @@ async fn get_board_users(_: AuthorizationService, board: web::Json<BoardGetWithI
     }
 }
 
+#[post("/card/updateCard")]
+async fn update_card(_: AuthorizationService, card: web::Json<UpdateCard>) -> HttpResponse {
+    let services = CardServices {};
+    let result = services.update_card(card.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_boards);
     cfg.service(board_create_card);
     cfg.service(insert_task_to_card);
     cfg.service(move_task_to_another_card);
     cfg.service(get_board_users);
+    cfg.service(update_card);
 }

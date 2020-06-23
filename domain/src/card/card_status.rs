@@ -11,3 +11,12 @@ impl Default for CardStatus {
         CardStatus::InProgress
     }
 }
+
+impl From<CardStatus> for bson::Bson {
+    fn from(value: CardStatus) -> Self {
+        match value {
+            CardStatus::InProgress => bson::Bson::String("InProgress".to_owned()),
+            CardStatus::Completed => bson::Bson::String("Completed".to_owned()),
+        }
+    }
+}

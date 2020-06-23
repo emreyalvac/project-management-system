@@ -9,12 +9,15 @@ use crate::task_services::task::{TaskServices, TTaskServices};
 use commands::commands::card_commands::insert_task_to_card_command::InsertTaskToCardCommand;
 use domain::card::move_task_to_another_card::MoveTaskToAnotherCard;
 use commands::commands::card_commands::move_task_to_another_card_command::MoveTaskToAnotherCardCommand;
+use domain::card::update_card::UpdateCard;
+use commands::commands::board_commands::update_card_command::UpdateCardCommand;
 
 #[async_trait]
 pub trait TCardServices {
     async fn insert_card(&self, card: InsertCardToBoard) -> Result<CommandResponse, CommandResponse>;
     async fn insert_task_to_card(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse>;
     async fn move_task_to_another_card(&self, task: MoveTaskToAnotherCard) -> Result<CommandResponse, CommandResponse>;
+    async fn update_card(&self, card: UpdateCard) -> Result<CommandResponse, CommandResponse>;
 }
 
 pub struct CardServices {}
@@ -49,6 +52,17 @@ impl TCardServices for CardServices {
     async fn move_task_to_another_card(&self, task: MoveTaskToAnotherCard) -> Result<CommandResponse, CommandResponse> {
         let factory = CardCommandHandlerFactory {};
         let mut handler = factory.build_for_move_task_to_another_card(MoveTaskToAnotherCardCommand { task });
+        let result = handler.execute().await;
+        if result.status {
+            Ok(result)
+        } else {
+            Err(result)
+        }
+    }
+
+    async fn update_card(&self, card: UpdateCard) -> Result<CommandResponse, CommandResponse> {
+        let factory = CardCommandHandlerFactory {};
+        let mut handler = factory.build_for_update_card(UpdateCardCommand { card });
         let result = handler.execute().await;
         if result.status {
             Ok(result)
