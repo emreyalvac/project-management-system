@@ -11,3 +11,12 @@ impl TaskStatus {
         TaskStatus::InProgress
     }
 }
+
+impl From<TaskStatus> for bson::Bson {
+    fn from(value: TaskStatus) -> Self {
+        match value {
+            TaskStatus::InProgress => bson::Bson::String("InProgress".to_owned()),
+            TaskStatus::Completed => bson::Bson::String("Completed".to_owned())
+        }
+    }
+}

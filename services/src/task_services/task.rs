@@ -4,10 +4,13 @@ use domain::common::command_response::CommandResponse;
 use commands::factory::task_command_handler_factory::{TaskCommandHandlerFactory, TTaskCommandHandlerFactory};
 use commands::commands::task_commands::insert_task_command::InsertTaskCommand;
 use domain::command::command::TCommandHandler;
+use domain::task::update_task::UpdateTask;
+use commands::commands::task_commands::update_task_command::UpdateTaskCommand;
 
 #[async_trait]
 pub trait TTaskServices {
     async fn insert_task(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse>;
+    async fn update_task(&self, task: UpdateTask) -> Result<CommandResponse, CommandResponse>;
 }
 
 pub struct TaskServices {}
@@ -17,6 +20,17 @@ impl TTaskServices for TaskServices {
     async fn insert_task(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse> {
         let factory = TaskCommandHandlerFactory {};
         let mut handler = factory.build_for_insert(InsertTaskCommand { task });
+        let result = handler.execute().await;
+        if result.status {
+            Ok(result)
+        } else {
+            Err(result)
+        }
+    }
+
+    async fn update_task(&self, task: UpdateTask) -> Result<CommandResponse, CommandResponse> {
+        let factory = TaskCommandHandlerFactory {};
+        let mut handler = factory.build_for_update(UpdateTaskCommand { task });
         let result = handler.execute().await;
         if result.status {
             Ok(result)
