@@ -1,3 +1,4 @@
+pub mod check_user_board_query_handler;
 pub mod user_get_by_id_query_handler;
 pub mod user_get_by_email_query_handler;
 pub mod get_user_boards_aggregate_query_handler;
