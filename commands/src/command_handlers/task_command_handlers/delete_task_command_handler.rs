@@ -23,7 +23,7 @@ impl TCommandHandler<DeleteTaskCommand, CommandResponse> for DeleteTaskCommandHa
                 match handler {
                     Ok(_) => {
                         CommandResponse { status: true, message: "Delete OK".to_owned(), command_type: CommandType::DeleteTask }
-                    },
+                    }
                     Err(_) => {
                         CommandResponse { status: false, message: "Delete Failed".to_owned(), command_type: CommandType::DeleteTask }
                     }

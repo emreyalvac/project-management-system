@@ -10,6 +10,8 @@ use middlewares::auth::auth::AuthorizationService;
 use domain::user::insert_board_to_user::InsertBoardToUser;
 use helpers::token_decoder::token_decoder;
 use domain::common::claims::Claims;
+use domain::user::invite_user_to_board::InviteUserToBoard;
+use domain::user::get_by_email::GetByEmail;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
@@ -115,6 +117,43 @@ async fn get_user_informations(_: AuthorizationService, req: HttpRequest) -> Htt
     }
 }
 
+#[post("/inviteUserToBoard")]
+async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<Mutex<EmailWorker>>>, invite: web::Json<InviteUserToBoard>) -> HttpResponse {
+    let services = UserServices {};
+    let inner_invite = invite.into_inner();
+    match services.invite_user_with_email(inner_invite).await {
+        Ok(response) => {
+            let worker = email_job.lock().unwrap();
+            let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Invite Token -> {}", response.token), subject: "Invite User".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+            match email_result {
+                Ok(_) => {
+                    HttpResponse::Ok().json(true)
+                }
+                Err(_) => {
+                    HttpResponse::Ok().json(false)
+                }
+            }
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
+#[get("/checkAndApplyInvite/{token}")]
+async fn check_and_apply_invite(_: AuthorizationService, token: web::Path<String>) -> HttpResponse {
+    let services = UserServices {};
+    let result = services.check_and_apply_invite(token.into_inner()).await;
+    match result {
+        Ok(_) => {
+            HttpResponse::Ok().json(true)
+        }
+        Err(_) => {
+            HttpResponse::Ok().json(false)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(register);
@@ -122,4 +161,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_user_boards);
     cfg.service(insert_board_to_user);
     cfg.service(get_user_informations);
+    cfg.service(invite_user_to_board);
+    cfg.service(check_and_apply_invite);
 }

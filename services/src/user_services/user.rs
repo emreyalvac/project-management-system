@@ -31,6 +31,11 @@ use crate::board_services::board::{BoardServices, TBoardServices};
 use domain::board::insertable_board::InsertableBoard;
 use queries::queries::user_queries::user_get_by_id_query::UserGetByIdQuery;
 use domain::board::board_status::BoardStatus;
+use domain::user::invite_user_to_board::InviteUserToBoard;
+use domain::common::common_response::CommonResponse;
+use domain::common::invite_user_claims::{InviteUserClaims, SubInviteUserClaims};
+use domain::user::invite_user_response::InviteUserResponse;
+use commands::commands::user_commands::check_and_apply_invite_command::CheckAndApplyInviteCommand;
 
 #[async_trait]
 pub trait TUserServices {
@@ -42,6 +47,8 @@ pub trait TUserServices {
     async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate>;
     async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse>;
     async fn get_by_id(&self, user: UserGetById) -> Result<User, NotFound>;
+    async fn invite_user_with_email(&self, invite: InviteUserToBoard) -> Result<InviteUserResponse, CommonResponse>;
+    async fn check_and_apply_invite(&self, token: String) -> Result<bool, bool>;
 }
 
 pub struct UserServices {}
@@ -193,6 +200,53 @@ impl TUserServices for UserServices {
             }
             Err(err) => {
                 Err(err)
+            }
+        }
+    }
+
+    async fn invite_user_with_email(&self, invite: InviteUserToBoard) -> Result<InviteUserResponse, CommonResponse> {
+        let invite_user = invite;
+        let user_find = self.get_by_email(GetByEmail { email: invite_user.email }).await;
+        match user_find {
+            Ok(user) => {
+                let ref_user = &user;
+                let key = SECRET_KEY.as_bytes();
+                let date: DateTime<Utc> = Utc::now() + Duration::hours(24);
+                let my_claims = InviteUserClaims {
+                    sub: SubInviteUserClaims { board_id: invite_user.board_id, user_id: (&ref_user.id).parse().unwrap() },
+                    exp: date.timestamp() as usize,
+                };
+                match encode(&Header::default(), &my_claims, &EncodingKey::from_secret(key)) {
+                    Ok(token) => {
+                        return Ok(InviteUserResponse { email: user.email, token });
+                    }
+                    Err(_) => {
+                        return Err(CommonResponse { status: false, message: "Token Generate Error".to_owned() });
+                    }
+                };
+            }
+            Err(_) => {
+                Err(CommonResponse { status: false, message: "User not found".to_owned() })
+            }
+        }
+    }
+
+    async fn check_and_apply_invite(&self, token: String) -> Result<bool, bool> {
+        let key = SECRET_KEY.as_bytes();
+        match decode::<InviteUserClaims>(token.as_str(), &DecodingKey::from_secret(key), &Validation::new(Algorithm::HS256)) {
+            Ok(claims) => {
+                let user = claims.claims.sub;
+                let factory = UserCommandHandlerFactory {};
+                let mut handler = factory.build_for_check_and_apply_invite(CheckAndApplyInviteCommand { board_id: user.board_id, user_id: user.user_id });
+                let result = handler.execute().await;
+                if result.status {
+                    Ok(true)
+                } else {
+                    Err(false)
+                }
+            }
+            Err(_) => {
+                Err(false)
             }
         }
     }

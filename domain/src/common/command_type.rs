@@ -13,5 +13,6 @@ pub enum CommandType {
     MoveTaskToAnotherCard,
     UpdateCard,
     UpdateTask,
-    DeleteTask
+    DeleteTask,
+    CheckAndApplyInvite
 }
