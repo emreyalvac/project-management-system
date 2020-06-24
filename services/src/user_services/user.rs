@@ -262,7 +262,7 @@ impl TUserServices for UserServices {
             }
         }
     }
-c
+
     async fn check_user_board(&self, board_id: String, user_id: String) -> Result<bool, bool> {
         let factory = UserQueryHandlerFactory {};
         let handler = factory.build_for_check_user_board(CheckUserBoardQuery { board_id, user_id }).await;
