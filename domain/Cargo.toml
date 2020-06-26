@@ -10,4 +10,4 @@ edition = "2018"
 serde = "1.0.111"
 async-trait = "0.1.35"
 uuid = { version = "0.8", features = ["serde", "v4"] }
-bson = "0.14.1"
+bson = "1.0.0"

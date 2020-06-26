@@ -24,9 +24,9 @@ impl TCommandHandler<MoveTaskToAnotherCardCommand, CommandResponse> for MoveTask
                 let to_card_id = &self.command.task.to_card_id;
                 let from_card_id = &self.command.task.from_card_id;
                 let task_id = &self.command.task.task_id;
-                let remove_element_query = doc! {"$pull" => {"card_tasks" => {"$in": [task_id]}}};
+                let remove_element_query = doc! {"$pull": {"card_tasks": {"$in": [task_id]}}};
                 let remove_element = repository.update(doc! {"card_id": from_card_id}, remove_element_query).await;
-                let add_element_query = doc! {"$push" => {"card_tasks": task_id}};
+                let add_element_query = doc! {"$push": {"card_tasks": task_id}};
                 let add_element = repository.update(doc! {"card_id": to_card_id}, add_element_query).await;
                 match remove_element {
                     Ok(_) => {

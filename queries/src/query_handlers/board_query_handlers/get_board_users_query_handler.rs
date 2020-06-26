@@ -18,10 +18,10 @@ impl TQueryHandler<GetBoardUsersQuery, BoardUsersAggregate, NotFound> for GetBoa
         let connection = database.get_connection().await.ok().unwrap();
         let repository = GenericRepository { collection: "boards".to_owned(), connection };
         let board_id = &self.query.board_id;
-        let match_query = doc! {"$match" => {"board_id": board_id}};
-        let lookup_query = doc! {"$lookup" => {"from": "users", "localField": "board_id", "foreignField": "user_boards", "as": "users"}};
+        let match_query = doc! {"$match":{"board_id": board_id}};
+        let lookup_query = doc! {"$lookup": {"from": "users", "localField": "board_id", "foreignField": "user_boards", "as": "users"}};
         let unwind_query = doc! {"$unwind": "$users"};
-        let group_query = doc! {"$group" => {"_id": "$_id", "board": {"$first" => {"board_name": "$board_name", "board_id": "$board_id", "board_manager_user_id": "$board_manager_user_id", "board_status": "$board_status"}}, "users": {"$push": "$users"}}};
+        let group_query = doc! {"$group": {"_id": "$_id", "board": {"$first": {"board_name": "$board_name", "board_id": "$board_id", "board_manager_user_id": "$board_manager_user_id", "board_status": "$board_status"}}, "users": {"$push": "$users"}}};
         let result = repository.aggregate_one::<BoardUsersAggregate>(vec![match_query, lookup_query, unwind_query, group_query]).await;
         match result {
             Ok(res) => {

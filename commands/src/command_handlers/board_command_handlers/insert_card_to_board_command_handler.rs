@@ -21,7 +21,7 @@ impl TCommandHandler<InsertCardToBoardCommand, CommandResponse> for InsertCardTo
                 let repository = GenericRepository { collection: "boards".to_owned(), connection: client };
                 let board_id = self.command.card.board_id.clone();
                 let card_id = self.command.card.card_id.clone();
-                let execute = repository.update(doc! {"board_id": board_id}, doc! {"$push" => {"board_cards": card_id}}).await;
+                let execute = repository.update(doc! {"board_id": board_id}, doc! {"$push": {"board_cards": card_id}}).await;
                 match execute {
                     Ok(_) => return CommandResponse { command_type: CommandType::InsertCardToBoard, status: true, message: "OK".to_owned() },
                     Err(_) => return CommandResponse { command_type: CommandType::InsertCardToBoard, status: false, message: "Insert Failed".to_owned() }

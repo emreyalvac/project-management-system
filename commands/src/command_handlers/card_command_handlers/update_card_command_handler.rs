@@ -19,7 +19,7 @@ impl TCommandHandler<UpdateCardCommand, CommandResponse> for UpdateCardCommandHa
             Ok(client) => {
                 let repository: GenericRepository = GenericRepository { collection: "cards".to_owned(), connection: client };
                 let card = self.command.card.clone();
-                let result = repository.update(doc! {"card_id": card.card_id}, doc! {"$set" => {"card_name": card.card_name, "card_status": card.card_status}}).await;
+                let result = repository.update(doc! {"card_id": card.card_id}, doc! {"$set": {"card_name": card.card_name, "card_status": card.card_status}}).await;
                 match result {
                     Ok(_) => {
                         CommandResponse { status: true, command_type: CommandType::UpdateCard, message: "Update OK".to_owned() }

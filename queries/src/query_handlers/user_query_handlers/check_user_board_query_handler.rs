@@ -19,7 +19,7 @@ impl TQueryHandler<CheckUserBoardQuery, bool, bool> for CheckUserBoardQueryHandl
                 let repository: GenericRepository = GenericRepository { collection: "users".to_owned(), connection: client };
                 let board_id = &self.query.board_id;
                 let user_id = &self.query.user_id;
-                let query = doc! {"$match" => {"user_boards": board_id, "id": user_id}};
+                let query = doc! {"$match": {"user_boards": board_id, "id": user_id}};
                 let handler = repository.aggregate_one::<User>(vec![query]).await;
                 match handler {
                     Ok(_) => {

@@ -10,4 +10,4 @@ edition = "2018"
 domain = {path = "./../domain"}
 data-access = {path = "./../data-access"}
 async-trait = "0.1.35"
-bson = "0.14.1"
+bson = "1.0.0"

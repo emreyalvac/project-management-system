@@ -21,7 +21,7 @@ impl TCommandHandler<InsertTaskToCardCommand, CommandResponse> for InsertTaskToC
                 let repository = GenericRepository { collection: "cards".to_owned(), connection: client };
                 let card_id = &self.command.task.card_id;
                 let task_id = &self.command.task.task_id;
-                let update = repository.update(doc! {"card_id": card_id}, doc! {"$push" => {"card_tasks":  task_id}}).await;
+                let update = repository.update(doc! {"card_id": card_id}, doc! {"$push": {"card_tasks":  task_id}}).await;
                 match update {
                     Ok(_) => {
                         CommandResponse { message: "OK".to_owned(), status: true, command_type: CommandType::InsertTaskToCard }

@@ -20,7 +20,7 @@ impl TCommandHandler<CheckAndApplyInviteCommand, CommandResponse> for CheckAndAp
                 let repository: GenericRepository = GenericRepository { collection: "users".to_owned(), connection: client };
                 let user_id = &self.command.user_id;
                 let board_id = &self.command.board_id;
-                let result = repository.update(doc! {"id": user_id}, doc! {"$push" => {"user_boards":  board_id}}).await;
+                let result = repository.update(doc! {"id": user_id}, doc! {"$push": {"user_boards":  board_id}}).await;
                 match result {
                     Ok(_) => {
                         CommandResponse { status: true, message: "Update OK".to_owned(), command_type: CommandType::CheckAndApplyInvite }

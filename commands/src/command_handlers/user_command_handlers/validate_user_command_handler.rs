@@ -19,7 +19,7 @@ impl TCommandHandler<ValidateUserCommand, CommandResponse> for ValidateUserComma
         let repository: GenericRepository = GenericRepository { collection: "users".to_owned(), connection };
         let id = self.command.id.clone();
         let filter = doc! {"id": id};
-        let data = doc! {"$set" => {"is_validate": true}};
+        let data = doc! {"$set": {"is_validate": true}};
         let result = repository.update(filter, data).await;
         match result {
             Ok(_) => {

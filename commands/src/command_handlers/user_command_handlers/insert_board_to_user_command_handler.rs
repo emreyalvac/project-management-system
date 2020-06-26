@@ -21,7 +21,7 @@ impl TCommandHandler<InsertBoardToUserCommand, CommandResponse> for InsertBoardT
                 let repository: GenericRepository = GenericRepository { collection: "users".to_owned(), connection: client };
                 let user_id = self.command.user_board.user_id.clone();
                 let board_id = self.command.user_board.board_id.clone();
-                let handler = repository.update(doc! {"id": user_id}, doc! {"$push" => {"user_boards": board_id}}).await;
+                let handler = repository.update(doc! {"id": user_id}, doc! {"$push": {"user_boards": board_id}}).await;
                 match handler {
                     Ok(_) => {
                         return CommandResponse { status: true, command_type: CommandType::InsertBoardToUser, message: "OK".to_owned() };
