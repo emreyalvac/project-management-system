@@ -12,6 +12,7 @@ use helpers::token_decoder::token_decoder;
 use domain::common::claims::Claims;
 use domain::user::invite_user_to_board::InviteUserToBoard;
 use domain::user::get_by_email::GetByEmail;
+use domain::user::update_user::UpdateUser;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
@@ -154,6 +155,25 @@ async fn check_and_apply_invite(_: AuthorizationService, token: web::Path<String
     }
 }
 
+#[post("/updateUser")]
+async fn update_user(_: AuthorizationService, user: web::Json<UpdateUser>, req: HttpRequest) -> HttpResponse {
+    let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
+    let result = token_decoder::<Claims>(header);
+    let user_id = result.unwrap().sub;
+    let services = UserServices {};
+    let mut user = user.into_inner();
+    user.user_id = user_id;
+    let result = services.update_user(user).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(login);
     cfg.service(register);
@@ -163,4 +183,5 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_user_informations);
     cfg.service(invite_user_to_board);
     cfg.service(check_and_apply_invite);
+    cfg.service(update_user);
 }

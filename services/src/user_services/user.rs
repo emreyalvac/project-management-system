@@ -37,6 +37,8 @@ use domain::common::invite_user_claims::{InviteUserClaims, SubInviteUserClaims};
 use domain::user::invite_user_response::InviteUserResponse;
 use commands::commands::user_commands::check_and_apply_invite_command::CheckAndApplyInviteCommand;
 use queries::queries::user_queries::check_user_board_query::CheckUserBoardQuery;
+use domain::user::update_user::UpdateUser;
+use commands::commands::user_commands::update_user_command::UpdateUserCommand;
 
 #[async_trait]
 pub trait TUserServices {
@@ -51,6 +53,7 @@ pub trait TUserServices {
     async fn invite_user_with_email(&self, invite: InviteUserToBoard) -> Result<InviteUserResponse, CommonResponse>;
     async fn check_and_apply_invite(&self, token: String) -> Result<bool, bool>;
     async fn check_user_board(&self, board_id: String, user_id: String) -> Result<bool, bool>;
+    async fn update_user(&self, user: UpdateUser) -> Result<CommandResponse, CommandResponse>;
 }
 
 pub struct UserServices {}
@@ -274,6 +277,17 @@ impl TUserServices for UserServices {
             Err(_) => {
                 Err(false)
             }
+        }
+    }
+
+    async fn update_user(&self, user: UpdateUser) -> Result<CommandResponse, CommandResponse> {
+        let factory = UserCommandHandlerFactory {};
+        let mut handler = factory.build_for_update(UpdateUserCommand { user });
+        let result = handler.execute().await;
+        if result.status {
+            Ok(result)
+        } else {
+            Err(result)
         }
     }
 }

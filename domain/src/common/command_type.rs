@@ -14,5 +14,6 @@ pub enum CommandType {
     UpdateCard,
     UpdateTask,
     DeleteTask,
-    CheckAndApplyInvite
+    CheckAndApplyInvite,
+    UpdateUser
 }

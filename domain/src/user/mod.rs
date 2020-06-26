@@ -1,3 +1,4 @@
+pub mod update_user;
 pub mod invite_user_response;
 pub mod invite_user_to_board;
 pub mod get_by_email;

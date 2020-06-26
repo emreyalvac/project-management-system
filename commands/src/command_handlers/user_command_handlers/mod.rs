@@ -1,3 +1,4 @@
+pub mod update_user_command_handler;
 pub mod check_and_apply_invite_command_handler;
 pub mod insert_user_command_handler;
 pub mod validate_user_command_handler;
