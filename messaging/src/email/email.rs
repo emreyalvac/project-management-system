@@ -15,9 +15,6 @@ pub trait TEmail {
 
 pub struct Email {}
 
-// rusttestemail12@gmail.com
-// https://github.com/djc/askama
-
 #[async_trait]
 impl TEmail for Email {
     // TODO : Test html for content

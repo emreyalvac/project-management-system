@@ -14,6 +14,10 @@
       <sourceFolder url="file://$MODULE_DIR$/middlewares/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/helpers/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/.tmp" />
+      <excludeFolder url="file://$MODULE_DIR$/api/target" />
+      <excludeFolder url="file://$MODULE_DIR$/background_jobs/target" />
+      <excludeFolder url="file://$MODULE_DIR$/cache/target" />
+      <excludeFolder url="file://$MODULE_DIR$/commands/target" />
       <excludeFolder url="file://$MODULE_DIR$/data-access/target" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
       <excludeFolder url="file://$MODULE_DIR$/temp" />
