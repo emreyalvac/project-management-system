@@ -18,6 +18,7 @@ pub trait TGenericRepository {
     async fn aggregate_one<T>(&self, queries: Vec<Document>) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync + Debug;
     async fn update(&self, filter: Document, data: Document) -> Result<bool, bool>;
     async fn delete_one(&self, filter: Document) -> Result<bool, bool>;
+    async fn get_by_custom_query<T>(&self, filter: Document) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send;
 }
 
 pub struct GenericRepository {
@@ -166,5 +167,29 @@ impl TGenericRepository for GenericRepository {
                 Err(false)
             }
         }
+    }
+
+    async fn get_by_custom_query<T>(&self, filter: Document) -> Vec<T> where T: DeserializeOwned + 'static + Sized + Send {
+        let db = self.connection.database("project_management");
+        let mut cursor = db.collection(self.collection.as_str()).find(filter, None).await.unwrap();
+        let mut data: Vec<T> = Vec::new();
+        while let Some(result) = cursor.next().await {
+            match result {
+                Ok(document) => {
+                    match from_bson::<T>(Bson::Document(document)) {
+                        Ok(doc) => {
+                            data.push(doc)
+                        }
+                        Err(_) => {
+                            return data;
+                        }
+                    }
+                }
+                Err(_) => {
+                    return data;
+                }
+            }
+        }
+        data
     }
 }

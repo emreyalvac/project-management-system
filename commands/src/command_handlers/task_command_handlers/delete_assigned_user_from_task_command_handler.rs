@@ -21,14 +21,14 @@ impl TCommandHandler<DeleteAssignedUserFromTaskCommand, CommandResponse> for Del
                 let task_id = &self.command.task_id;
                 let user_id = &self.command.user_id;
                 let result = repository.update(doc! {"task_id": task_id}, doc! {"$pull": {"task_assigned_users": user_id}}).await;
-                match result {
+                return match result {
                     Ok(_) => {
-                        return CommandResponse { status: true, message: "OK".to_owned(), command_type: CommandType::DeleteAssignedUserFromTask };
+                        CommandResponse { status: true, message: "OK".to_owned(), command_type: CommandType::DeleteAssignedUserFromTask }
                     }
                     Err(_) => {
-                        return CommandResponse { status: false, message: "Delete Failed".to_owned(), command_type: CommandType::DeleteAssignedUserFromTask };
+                        CommandResponse { status: false, message: "Delete Failed".to_owned(), command_type: CommandType::DeleteAssignedUserFromTask }
                     }
-                }
+                };
             }
             Err(_) => {
                 return CommandResponse { status: false, message: "Connection Failed".to_owned(), command_type: CommandType::DeleteAssignedUserFromTask };

@@ -6,6 +6,7 @@ use data_access::database::database_connection::{DatabaseConnection, TDatabaseCo
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use bson::doc;
+use domain::task::task::Task;
 
 pub struct AssignTaskToUserCommandHandler {
     pub command: AssignTaskToUserCommand
@@ -20,14 +21,20 @@ impl TCommandHandler<AssignTaskToUserCommand, CommandResponse> for AssignTaskToU
                 let repository: GenericRepository = GenericRepository { connection, collection: "tasks".to_owned() };
                 let task_id = &self.command.task_id;
                 let user_id = &self.command.user_id;
-                let result = repository.update(doc! {"task_id": task_id}, doc! {"$push": {"task_assigned_users": user_id}}).await;
-                match result {
-                    Ok(_) => {
-                        CommandResponse { status: true, message: "Assign OK".to_owned(), command_type: CommandType::AssignTaskToUser }
+                // Check user exist
+                let check_is_user_exist = repository.get_by_custom_query::<Task>(doc! {"task_id": task_id, "task_assigned_users": {"$in": [user_id]}}).await;
+                if check_is_user_exist.is_empty() {
+                    let result = repository.update(doc! {"task_id": task_id}, doc! {"$push": {"task_assigned_users": user_id}}).await;
+                    match result {
+                        Ok(_) => {
+                            CommandResponse { status: true, message: "Assign OK".to_owned(), command_type: CommandType::AssignTaskToUser }
+                        }
+                        Err(_) => {
+                            CommandResponse { status: false, message: "Assign Failed".to_owned(), command_type: CommandType::AssignTaskToUser }
+                        }
                     }
-                    Err(_) => {
-                        CommandResponse { status: false, message: "Assign Failed".to_owned(), command_type: CommandType::AssignTaskToUser }
-                    }
+                } else {
+                    CommandResponse { status: false, command_type: CommandType::AssignTaskToUser, message: "User already have this task".to_owned() }
                 }
             }
             Err(_) => {
