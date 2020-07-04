@@ -41,7 +41,7 @@ async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<
             std::thread::spawn(move || {
                 let worker = email_job.lock().unwrap();
                 let validate = block_on(services.generate_token_for_validation(into));
-                block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Validation Key -> {}", validate), subject: "Validation".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+                block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Merhabalar, <br/><br/> Üye olduğunuz için teşekkürler. Üyeliğinizi onaylamak için <a href=\"http://localhost:3000/validate/{}\">tıklayınız</a>", validate), subject: "Üyelik Onaylama".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
             });
             HttpResponse::Ok().json(res)
         }
@@ -125,7 +125,7 @@ async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<
     match services.invite_user_with_email(inner_invite).await {
         Ok(response) => {
             let worker = email_job.lock().unwrap();
-            let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Invite Token -> {}", response.token), subject: "Invite User".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+            let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Merhabalar, <br/><br/> Yeni bir panoya davet edildiniz. Daveti kabul etmek için <a href=\"http://localhost:3000/invite/{}\">tıklayınız</a>", response.token), subject: "Pano Daveti".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
             match email_result {
                 Ok(_) => {
                     HttpResponse::Ok().json(true)
