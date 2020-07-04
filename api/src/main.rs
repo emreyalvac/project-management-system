@@ -6,6 +6,8 @@ use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker};
 use cache::redis::redis::Redis;
 use std::sync::{Mutex, Arc};
 use actix_cors::Cors;
+use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+use mongodb::Client;
 
 // Mod
 mod user;
@@ -37,6 +39,11 @@ async fn main() -> Result<()> {
     // Create Redis Pool (Mutex)
     let redis_pool = web::Data::new(Mutex::new(Redis {}));
 
+    // Database Connection Pool
+    let database: DatabaseConnection = DatabaseConnection {};
+    let database_pool: web::Data<Arc<Mutex<Client>>> = web::Data::new(Arc::new(Mutex::new(database.get_connection().await.ok().unwrap())));
+
+
     std::thread::spawn(|| {
         let worker_fn = email_worker_process();
         block_on(worker_fn);
@@ -49,6 +56,8 @@ async fn main() -> Result<()> {
             .service(web::scope("/board").configure(board::routes::init_routes))
             // Pass App Data
             .app_data(email_worker.clone())
+            // Pass Database Pool
+            .app_data(database_pool.clone())
             // Pass Redis Pool
             .app_data(redis_pool.clone())
             .wrap(Cors::new().supports_credentials().finish())

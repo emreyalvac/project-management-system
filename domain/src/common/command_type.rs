@@ -15,5 +15,7 @@ pub enum CommandType {
     UpdateTask,
     DeleteTask,
     CheckAndApplyInvite,
-    UpdateUser
+    UpdateUser,
+    AssignTaskToUser,
+    DeleteAssignedUserFromTask
 }

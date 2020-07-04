@@ -10,6 +10,8 @@ edition = "2018"
 domain = {path = "./../domain"}
 background_jobs = {path = "./../background_jobs"}
 middlewares = {path = "./../middlewares"}
+data-access = {path = "./../data-access"}
+mongodb = "1.0.0"
 cache = {path = "./../cache"}
 services = {path = "./../services"}
 helpers = {path = "./../helpers"}

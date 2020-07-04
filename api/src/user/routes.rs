@@ -13,9 +13,12 @@ use domain::common::claims::Claims;
 use domain::user::invite_user_to_board::InviteUserToBoard;
 use domain::user::get_by_email::GetByEmail;
 use domain::user::update_user::UpdateUser;
+use mongodb::Client;
 
 #[post("/login")]
 async fn login(user: web::Json<LoginUser>) -> HttpResponse {
+    // Database
+
     let services = UserServices {};
     let result = services.login(user.into_inner()).await;
     match result {

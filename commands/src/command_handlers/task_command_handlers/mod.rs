@@ -1,3 +1,5 @@
+pub mod delete_assigned_user_from_task_command_handler;
+pub mod assign_task_to_user_command_handler;
 pub mod delete_task_command_handler;
 pub mod update_task_command_handler;
 pub mod insert_task_command_handler;

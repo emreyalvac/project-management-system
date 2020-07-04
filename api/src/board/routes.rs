@@ -10,6 +10,8 @@ use domain::card::update_card::UpdateCard;
 use domain::task::update_task::UpdateTask;
 use services::task_services::task::{TaskServices, TTaskServices};
 use domain::task::delete_task::DeleteTask;
+use domain::task::assign_task_to_user::AssignTaskToUser;
+use domain::task::delete_assigned_user_from_task::DeleteAssignedUserFromTask;
 
 #[get("/{id}")]
 async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
@@ -119,6 +121,34 @@ async fn delete_task(_: AuthorizationService, task: web::Json<DeleteTask>) -> Ht
     }
 }
 
+#[post("/task/assignTaskToUser")]
+async fn assign_task_to_user(_: AuthorizationService, task: web::Json<AssignTaskToUser>) -> HttpResponse {
+    let services = TaskServices {};
+    let result = services.assign_task_to_user(task.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
+#[post("/task/deleteAssignedUserFromTask")]
+async fn delete_assigned_user_from_task(_: AuthorizationService, task: web::Json<DeleteAssignedUserFromTask>) -> HttpResponse {
+    let services = TaskServices {};
+    let result = services.delete_assigned_user_from_task(task.into_inner()).await;
+    match result {
+        Ok(res) => {
+            HttpResponse::Ok().json(res)
+        }
+        Err(err) => {
+            HttpResponse::Ok().json(err)
+        }
+    }
+}
+
 pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(get_boards);
     cfg.service(board_create_card);
@@ -128,4 +158,6 @@ pub fn init_routes(cfg: &mut web::ServiceConfig) {
     cfg.service(update_card);
     cfg.service(update_task);
     cfg.service(delete_task);
+    cfg.service(assign_task_to_user);
+    cfg.service(delete_assigned_user_from_task);
 }
