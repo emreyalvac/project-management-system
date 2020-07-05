@@ -3,7 +3,7 @@ use domain::query::query::TQueryHandler;
 use async_trait::async_trait;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 use domain::user::user::User;
 
 pub struct CheckUserBoardQueryHandler {

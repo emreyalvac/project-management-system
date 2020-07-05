@@ -116,12 +116,13 @@ impl TUserServices for UserServices {
     async fn register(&self, mut register: Register) -> Result<CommandResponse, CommandResponse> {
         let cloned_register = register.clone();
         let check_is_exist = self.get_by_email(GetByEmail { email: cloned_register.email }).await;
+        let client = self.client.to_owned();
         match check_is_exist {
             Ok(_) => {
                 Err(CommandResponse { message: "Found".to_owned(), command_type: CommandType::UserInsert, status: false })
             }
             Err(_) => {
-                let factory = UserCommandHandlerFactory {};
+                let factory = UserCommandHandlerFactory { client };
                 let mut sha = Sha256::new();
                 sha.input(register.password.as_ref());
                 register.password = sha.result_str();
@@ -148,7 +149,8 @@ impl TUserServices for UserServices {
     }
 
     async fn validate_user(&self, token: String) -> Result<CommandResponse, CommandResponse> {
-        let factory = UserCommandHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserCommandHandlerFactory { client };
         let key = SECRET_KEY.as_bytes();
         let decoded = match decode::<ValidateUserClaims>(token.as_str(), &DecodingKey::from_secret(key), &Validation::new(Algorithm::HS256)) {
             Ok(decoded) => {
@@ -179,7 +181,8 @@ impl TUserServices for UserServices {
     }
 
     async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse> {
-        let factory = UserCommandHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserCommandHandlerFactory { client };
         let board_service = BoardServices {};
         let cloned_board = board.clone();
         let insert_board = board.clone();
@@ -254,7 +257,8 @@ impl TUserServices for UserServices {
             Ok(claims) => {
                 let user = &claims.claims.sub;
                 if self.check_user_board((&user.board_id).parse().unwrap(), (&user.user_id).parse().unwrap()).await.is_ok() {
-                    let factory = UserCommandHandlerFactory {};
+                    let client = self.client.to_owned();
+                    let factory = UserCommandHandlerFactory { client };
                     let mut handler = factory.build_for_check_and_apply_invite(CheckAndApplyInviteCommand { board_id: (&user.board_id).parse().unwrap(), user_id: (&user.user_id).parse().unwrap() });
                     let result = handler.execute().await;
                     if result.status {
@@ -288,7 +292,8 @@ impl TUserServices for UserServices {
     }
 
     async fn update_user(&self, user: UpdateUser) -> Result<CommandResponse, CommandResponse> {
-        let factory = UserCommandHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserCommandHandlerFactory { client };
         let mut handler = factory.build_for_update(UpdateUserCommand { user });
         let result = handler.execute().await;
         if result.status {

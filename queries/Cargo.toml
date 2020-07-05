@@ -10,9 +10,4 @@ edition = "2018"
 domain = {path = "./../domain"}
 async-trait = "0.1.35"
 data-access = {path = "./../data-access"}
-bson = "1.0.0"
-
-[dependencies.mongodb]
-version = "1.0.0"
-default-features = false
-features = ["async-std-runtime"]
+mongodb = "1.0.0"

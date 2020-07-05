@@ -4,7 +4,7 @@ use domain::common::command_response::CommandResponse;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 use async_trait::async_trait;
 
 pub struct InsertTaskToCardCommandHandler {

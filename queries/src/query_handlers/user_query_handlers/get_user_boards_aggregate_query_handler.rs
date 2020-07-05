@@ -3,7 +3,7 @@ use domain::query::query::TQueryHandler;
 use domain::board::board::Board;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 use async_trait::async_trait;
 use domain::aggregates::board_user_aggregate::BoardUserAggregate;
 

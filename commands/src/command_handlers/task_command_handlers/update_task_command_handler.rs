@@ -5,7 +5,7 @@ use async_trait::async_trait;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 
 pub struct UpdateTaskCommandHandler {
     pub command: UpdateTaskCommand

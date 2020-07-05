@@ -5,7 +5,7 @@ use data_access::database::database_connection::{DatabaseConnection, TDatabaseCo
 use async_trait::async_trait;
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 
 pub struct UpdateCardCommandHandler {
     pub command: UpdateCardCommand

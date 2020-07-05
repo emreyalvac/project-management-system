@@ -4,7 +4,7 @@ use domain::query::query::TQueryHandler;
 use domain::aggregates::board_aggregate::BoardAggregate;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use bson::doc;
+use mongodb::{bson::doc};
 use domain::common::not_found::NotFound;
 use std::collections::HashMap;
 

@@ -8,6 +8,7 @@ use crate::commands::user_commands::check_and_apply_invite_command::CheckAndAppl
 use crate::command_handlers::user_command_handlers::check_and_apply_invite_command_handler::CheckAndApplyInviteCommandHandler;
 use crate::commands::user_commands::update_user_command::UpdateUserCommand;
 use crate::command_handlers::user_command_handlers::update_user_command_handler::UpdateUserCommandHandler;
+use mongodb::Client;
 
 pub trait TUserCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertUserCommand) -> InsertUserCommandHandler;
@@ -17,26 +18,28 @@ pub trait TUserCommandHandlerFactory {
     fn build_for_update(&self, command: UpdateUserCommand) -> UpdateUserCommandHandler;
 }
 
-pub struct UserCommandHandlerFactory {}
+pub struct UserCommandHandlerFactory {
+    pub client: Client
+}
 
 impl TUserCommandHandlerFactory for UserCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertUserCommand) -> InsertUserCommandHandler {
-        InsertUserCommandHandler { command }
+        InsertUserCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_validate(&self, command: ValidateUserCommand) -> ValidateUserCommandHandler {
-        ValidateUserCommandHandler { command }
+        ValidateUserCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_insert_board(&self, command: InsertBoardToUserCommand) -> InsertBoardToUserCommandHandler {
-        InsertBoardToUserCommandHandler { command }
+        InsertBoardToUserCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_check_and_apply_invite(&self, command: CheckAndApplyInviteCommand) -> CheckAndApplyInviteCommandHandler {
-        CheckAndApplyInviteCommandHandler { command }
+        CheckAndApplyInviteCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_update(&self, command: UpdateUserCommand) -> UpdateUserCommandHandler {
-        UpdateUserCommandHandler { command }
+        UpdateUserCommandHandler { command, client: self.client.to_owned() }
     }
 }
