@@ -31,15 +31,15 @@ impl TDatabaseConnection for DatabaseConnection {
                 let ping = connection.database("project_management").run_command(doc! {"ping": 1}, None).await;
                 match ping {
                     Ok(_) => {
-                        return Ok(true);
+                        Ok(true)
                     }
                     Err(_) => {
-                        return Err(false);
+                        Err(false)
                     }
                 }
             }
             Err(_) => {
-                return Err(false);
+                Err(false)
             }
         }
     }

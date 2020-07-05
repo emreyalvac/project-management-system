@@ -4,7 +4,7 @@ use futures::future::{err, ok, Ready};
 use jsonwebtoken::{decode, Algorithm, DecodingKey, Validation};
 use domain::common::claims::Claims;
 
-static SECRET_KEY: &'static str = "d41d8cd98f00b204e9800998ecf8427e";
+static SECRET_KEY: &str = "d41d8cd98f00b204e9800998ecf8427e";
 
 #[derive(Debug)]
 pub struct AuthorizationService;
@@ -26,7 +26,7 @@ impl FromRequest for AuthorizationService {
                     &DecodingKey::from_secret(key),
                     &Validation::new(Algorithm::HS256),
                 ) {
-                    Ok(token) => ok(AuthorizationService),
+                    Ok(_token) => ok(AuthorizationService),
                     Err(_e) => err(ErrorUnauthorized("invalid token!")),
                 }
             }

@@ -110,7 +110,7 @@ impl TGenericRepository for GenericRepository {
 
     async fn aggregate_one<T>(&self, queries: Vec<Document>) -> Result<T, NotFound> where T: DeserializeOwned + 'static + Sized + Send + Serialize + Sync + Debug {
         let db = self.connection.database("project_management");
-        let mut cursor = db.collection(self.collection.as_str()).aggregate(queries, None).await;
+        let cursor = db.collection(self.collection.as_str()).aggregate(queries, None).await;
         let mut data: Option<T> = None;
         match cursor {
             Ok(mut result) => {
@@ -145,20 +145,20 @@ impl TGenericRepository for GenericRepository {
 
     async fn update(&self, filter: Document, data: Document) -> Result<bool, bool> {
         let db = self.connection.database("project_management");
-        let mut cursor = db.collection(self.collection.as_str()).update_one(filter, data, None).await;
-        return match cursor {
+        let cursor = db.collection(self.collection.as_str()).update_one(filter, data, None).await;
+        match cursor {
             Ok(_) => {
                 Ok(true)
             }
             Err(_) => {
                 Err(false)
             }
-        };
+        }
     }
 
     async fn delete_one(&self, filter: Document) -> Result<bool, bool> {
         let db = self.connection.database("project_management");
-        let mut cursor = db.collection(self.collection.as_str()).delete_one(filter, None).await;
+        let cursor = db.collection(self.collection.as_str()).delete_one(filter, None).await;
         match cursor {
             Ok(_) => {
                 Ok(true)

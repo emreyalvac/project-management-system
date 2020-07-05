@@ -1,4 +1,4 @@
-use serde::{Serialize, Deserialize, Deserializer};
+use serde::{Serialize, Deserialize};
 use crate::board::board::Board;
 use crate::aggregates::card_task_aggregate::CardTaskAggregate;
 

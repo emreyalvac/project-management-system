@@ -1,6 +1,6 @@
-use lettre_email::{EmailBuilder, Header};
+
 use lettre::{SmtpTransport, Transport, Message};
-use lettre::transport::smtp::SUBMISSION_PORT;
+
 use std::env;
 use lettre::transport::smtp::authentication::Credentials;
 use async_trait::async_trait;
@@ -49,7 +49,7 @@ impl TEmail for Email {
 
 #[cfg(test)]
 mod tests {
-    use tokio::io::AsyncWrite;
+    
     use super::*;
 
     #[tokio::test]

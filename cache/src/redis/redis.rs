@@ -32,7 +32,7 @@ impl TRedis for Redis {
             }
         };
         match client.set::<String, String, String>(key, data) {
-            Ok(result) => Ok(true),
+            Ok(_result) => Ok(true),
             Err(_) => Err(false)
         }
     }

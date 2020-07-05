@@ -1,7 +1,7 @@
 use jsonwebtoken::{decode, DecodingKey, Validation, Algorithm};
 use serde::de::DeserializeOwned;
 
-static SECRET_KEY: &'static str = "d41d8cd98f00b204e9800998ecf8427e";
+static SECRET_KEY: &str = "d41d8cd98f00b204e9800998ecf8427e";
 
 pub fn token_decoder<T>(header: String) -> Result<T, bool> where T: DeserializeOwned  {
     let key = SECRET_KEY.as_bytes();
