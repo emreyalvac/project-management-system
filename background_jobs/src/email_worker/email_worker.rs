@@ -60,7 +60,12 @@ impl TEmailWorker for EmailWorker {
         match send {
             Ok(_) => {
                 println!("Job Completed {:?} and deleted", json_job);
-                redis_connection.lpop::<String, Value>("queue::email_queue".to_owned());
+                match redis_connection.lpop::<String, Value>("queue::email_queue".to_owned()) {
+                    Ok(_) => {}
+                    Err(_) => {
+                        println!("Job Delete Failed");
+                    }
+                };
             }
             Err(_) => {
                 if job.iterate == 0 {
