@@ -4,7 +4,7 @@ use domain::user::login_user::LoginUser;
 use domain::user::register::Register;
 use futures::executor::block_on;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker, EmailJob};
-use std::sync::{Mutex, Arc};
+use std::sync::{Mutex, Arc, RwLock};
 use domain::user::user_get_by_id::UserGetById;
 use middlewares::auth::auth::AuthorizationService;
 use domain::user::insert_board_to_user::InsertBoardToUser;
@@ -16,10 +16,11 @@ use domain::user::update_user::UpdateUser;
 use mongodb::Client;
 
 #[post("/login")]
-async fn login(user: web::Json<LoginUser>) -> HttpResponse {
+async fn login(user: web::Json<LoginUser>, database: web::Data<RwLock<Client>>) -> HttpResponse {
     // Database
-
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.login(user.into_inner()).await;
     match result {
         Ok(res) => {
@@ -32,10 +33,12 @@ async fn login(user: web::Json<LoginUser>) -> HttpResponse {
 }
 
 #[post("/register")]
-async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<EmailWorker>>>) -> HttpResponse {
+async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<EmailWorker>>>, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let into = register.into_inner();
     let cloned = into.clone();
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.register(cloned).await;
     match result {
         Ok(res) => {
@@ -55,8 +58,10 @@ async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<
 }
 
 #[get("/validate/{token}")]
-async fn validate_token(token: web::Path<String>) -> HttpResponse {
-    let services = UserServices {};
+async fn validate_token(token: web::Path<String>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.validate_user(token.into_inner()).await;
     match result {
         Ok(res) => {
@@ -69,11 +74,13 @@ async fn validate_token(token: web::Path<String>) -> HttpResponse {
 }
 
 #[post("/getBoards")]
-async fn get_user_boards(_: AuthorizationService, req: HttpRequest) -> HttpResponse {
+async fn get_user_boards(_: AuthorizationService, req: HttpRequest, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
     let result = token_decoder::<Claims>(header);
     let user = result.unwrap().sub;
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.get_user_boards(UserGetById { user_id: user }).await;
     match result {
         Ok(data) => {
@@ -86,13 +93,15 @@ async fn get_user_boards(_: AuthorizationService, req: HttpRequest) -> HttpRespo
 }
 
 #[post("/createBoard")]
-async fn insert_board_to_user(_: AuthorizationService, mut board: web::Json<InsertBoardToUser>, req: HttpRequest) -> HttpResponse {
+async fn insert_board_to_user(_: AuthorizationService, mut board: web::Json<InsertBoardToUser>, req: HttpRequest, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
     let result = token_decoder::<Claims>(header);
     let user = result.unwrap().sub;
     board.user_id = (&user).parse().unwrap();
     board.board_manager_user_id = user;
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.insert_board(board.into_inner()).await;
     match result {
         Ok(res) => {
@@ -105,11 +114,13 @@ async fn insert_board_to_user(_: AuthorizationService, mut board: web::Json<Inse
 }
 
 #[get("/getUserInformations")]
-async fn get_user_informations(_: AuthorizationService, req: HttpRequest) -> HttpResponse {
+async fn get_user_informations(_: AuthorizationService, req: HttpRequest, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
     let result = token_decoder::<Claims>(header);
     let user = result.unwrap().sub;
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.get_by_id(UserGetById { user_id: user }).await;
     match result {
         Ok(res) => {
@@ -122,8 +133,10 @@ async fn get_user_informations(_: AuthorizationService, req: HttpRequest) -> Htt
 }
 
 #[post("/inviteUserToBoard")]
-async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<Mutex<EmailWorker>>>, invite: web::Json<InviteUserToBoard>) -> HttpResponse {
-    let services = UserServices {};
+async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<Mutex<EmailWorker>>>, invite: web::Json<InviteUserToBoard>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let inner_invite = invite.into_inner();
     match services.invite_user_with_email(inner_invite).await {
         Ok(response) => {
@@ -145,8 +158,10 @@ async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<
 }
 
 #[get("/checkAndApplyInvite/{token}")]
-async fn check_and_apply_invite(_: AuthorizationService, token: web::Path<String>) -> HttpResponse {
-    let services = UserServices {};
+async fn check_and_apply_invite(_: AuthorizationService, token: web::Path<String>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let result = services.check_and_apply_invite(token.into_inner()).await;
     match result {
         Ok(_) => {
@@ -159,11 +174,13 @@ async fn check_and_apply_invite(_: AuthorizationService, token: web::Path<String
 }
 
 #[post("/updateUser")]
-async fn update_user(_: AuthorizationService, user: web::Json<UpdateUser>, req: HttpRequest) -> HttpResponse {
+async fn update_user(_: AuthorizationService, user: web::Json<UpdateUser>, req: HttpRequest, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let header = req.headers().get("Authorization").unwrap().to_str().unwrap().to_string();
     let result = token_decoder::<Claims>(header);
     let user_id = result.unwrap().sub;
-    let services = UserServices {};
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = UserServices { client };
     let mut user = user.into_inner();
     user.user_id = user_id;
     let result = services.update_user(user).await;

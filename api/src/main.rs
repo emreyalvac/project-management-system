@@ -4,7 +4,7 @@ use futures::executor::block_on;
 use std::time::Duration;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker};
 use cache::redis::redis::Redis;
-use std::sync::{Mutex, Arc};
+use std::sync::{Mutex, Arc, RwLock};
 use actix_cors::Cors;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use mongodb::Client;
@@ -32,6 +32,7 @@ async fn email_worker_process() {
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
+
     // Create Email Worker
     let worker = EmailWorker {};
     let email_worker = web::Data::new(Arc::new(Mutex::new(worker)));
@@ -41,8 +42,8 @@ async fn main() -> Result<()> {
 
     // Database Connection Pool
     let database: DatabaseConnection = DatabaseConnection {};
-    let database_pool: web::Data<Arc<Mutex<Client>>> = web::Data::new(Arc::new(Mutex::new(database.get_connection().await.ok().unwrap())));
-
+    let connection = database.get_connection().await.ok().unwrap();
+    let database_pool: web::Data<RwLock<Client>> = web::Data::new(RwLock::new(connection));
 
     std::thread::spawn(|| {
         let worker_fn = email_worker_process();
@@ -54,16 +55,15 @@ async fn main() -> Result<()> {
             // Boards
             .service(web::scope("/user").configure(user::routes::init_routes))
             .service(web::scope("/board").configure(board::routes::init_routes))
+            // Database Pool
+            .app_data(database_pool.clone())
             // Pass App Data
             .app_data(email_worker.clone())
-            // Pass Database Pool
-            .app_data(database_pool.clone())
             // Pass Redis Pool
-            .app_data(redis_pool.clone())
             .wrap(Cors::new().supports_credentials().finish())
     })
         .keep_alive(Some(75))
-        .bind("127.0.0.1:5004").unwrap()
+        .bind("192.168.5.111:5004").unwrap()
         .run()
         .await
 }

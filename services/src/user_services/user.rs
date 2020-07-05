@@ -39,6 +39,7 @@ use commands::commands::user_commands::check_and_apply_invite_command::CheckAndA
 use queries::queries::user_queries::check_user_board_query::CheckUserBoardQuery;
 use domain::user::update_user::UpdateUser;
 use commands::commands::user_commands::update_user_command::UpdateUserCommand;
+use mongodb::Client;
 
 #[async_trait]
 pub trait TUserServices {
@@ -56,14 +57,17 @@ pub trait TUserServices {
     async fn update_user(&self, user: UpdateUser) -> Result<CommandResponse, CommandResponse>;
 }
 
-pub struct UserServices {}
+pub struct UserServices {
+    pub client: Client
+}
 
 static SECRET_KEY: &'static str = "d41d8cd98f00b204e9800998ecf8427e";
 
 #[async_trait]
 impl TUserServices for UserServices {
     async fn get_by_email(&self, user: GetByEmail) -> Result<User, NotFound> {
-        let factory = UserQueryHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserQueryHandlerFactory { client };
         let query = factory.build_for_email(UserGetByEmailQuery { email: user.email }).await;
         let result = query.get().await;
         match result {
@@ -164,7 +168,8 @@ impl TUserServices for UserServices {
     }
 
     async fn get_user_boards(&self, user: UserGetById) -> Result<BoardUserAggregate, BoardUserAggregate> {
-        let factory = UserQueryHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserQueryHandlerFactory { client };
         let handler = factory.build_for_boards(GetUserBoardsAggregateQuery { user_id: user.user_id }).await;
         let result = handler.get().await;
         match result {
@@ -196,7 +201,8 @@ impl TUserServices for UserServices {
     }
 
     async fn get_by_id(&self, user: UserGetById) -> Result<User, NotFound> {
-        let factory = UserQueryHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserQueryHandlerFactory { client };
         let mut handler = factory.build_for_get_by_id(UserGetByIdQuery { id: user.user_id }).await;
         let result = handler.get().await;
         match result {
@@ -267,7 +273,8 @@ impl TUserServices for UserServices {
     }
 
     async fn check_user_board(&self, board_id: String, user_id: String) -> Result<bool, bool> {
-        let factory = UserQueryHandlerFactory {};
+        let client = self.client.to_owned();
+        let factory = UserQueryHandlerFactory { client };
         let handler = factory.build_for_check_user_board(CheckUserBoardQuery { board_id, user_id }).await;
         let result = handler.get().await;
         match result {

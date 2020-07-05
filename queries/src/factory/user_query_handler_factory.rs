@@ -7,6 +7,7 @@ use crate::queries::user_queries::user_get_by_id_query::UserGetByIdQuery;
 use crate::query_handlers::user_query_handlers::user_get_by_id_query_handler::UserGetByIdQueryHandler;
 use crate::queries::user_queries::check_user_board_query::CheckUserBoardQuery;
 use crate::query_handlers::user_query_handlers::check_user_board_query_handler::CheckUserBoardQueryHandler;
+use mongodb::Client;
 
 #[async_trait]
 pub trait TUserQueryHandlerFactory {
@@ -16,12 +17,15 @@ pub trait TUserQueryHandlerFactory {
     async fn build_for_check_user_board(&self, query: CheckUserBoardQuery) -> CheckUserBoardQueryHandler;
 }
 
-pub struct UserQueryHandlerFactory {}
+pub struct UserQueryHandlerFactory {
+    pub client: Client
+}
 
 #[async_trait]
 impl TUserQueryHandlerFactory for UserQueryHandlerFactory {
     async fn build_for_email(&self, query: UserGetByEmailQuery) -> UserGetByEmailQueryHandler {
-        UserGetByEmailQueryHandler { query }
+        let client = self.client.to_owned();
+        UserGetByEmailQueryHandler { query, client }
     }
 
     async fn build_for_boards(&self, query: GetUserBoardsAggregateQuery) -> GetUserBoardsAggregateQueryHandler {

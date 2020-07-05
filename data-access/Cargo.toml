@@ -9,6 +9,10 @@ edition = "2018"
 [dependencies]
 domain = {path = "./../domain"}
 futures = "0.3.5"
-mongodb = "1.0.0"
 async-trait = "0.1.35"
 serde = "1.0.111"
+
+[dependencies.mongodb]
+version = "1.0.0"
+default-features = false
+features = ["async-std-runtime"]

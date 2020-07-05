@@ -1,4 +1,4 @@
-use mongodb::{Client, bson::doc};
+use mongodb::{Client, bson::doc, options::{ClientOptions}};
 use async_trait::async_trait;
 use domain::database::database_exceptions::DatabaseException;
 
@@ -13,7 +13,9 @@ pub struct DatabaseConnection {}
 #[async_trait]
 impl TDatabaseConnection for DatabaseConnection {
     async fn get_connection(&self) -> Result<Client, DatabaseException> {
-        match Client::with_uri_str("mongodb://127.0.0.1:27017").await {
+        let mut options = ClientOptions::parse("mongodb://127.0.0.1:27017").await.unwrap();
+        options.direct_connection = Some(true);
+        match Client::with_options(options) {
             Ok(client) => {
                 Ok(client)
             }
