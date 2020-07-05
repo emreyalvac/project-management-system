@@ -24,7 +24,7 @@ impl TCommandHandler<InsertBoardToUserCommand, CommandResponse> for InsertBoardT
             Ok(_) => {
                 return CommandResponse { status: true, command_type: CommandType::InsertBoardToUser, message: "OK".to_owned() };
             }
-            Err(err) => {
+            Err(_err) => {
                 return CommandResponse { status: false, command_type: CommandType::InsertBoardToUser, message: "Insert Failed".to_owned() };
             }
         }

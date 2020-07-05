@@ -1,5 +1,5 @@
 use std::io::Result;
-use actix_web::{HttpServer, App, get, HttpResponse, web};
+use actix_web::{HttpServer, App, web};
 use futures::executor::block_on;
 use std::time::Duration;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker};
@@ -37,7 +37,7 @@ async fn main() -> Result<()> {
     let email_worker = web::Data::new(Arc::new(RwLock::new(worker)));
 
     // Create Redis Pool (Mutex)
-    let redis_pool = web::Data::new(Mutex::new(Redis {}));
+    let _redis_pool = web::Data::new(Mutex::new(Redis {}));
 
     // Database Connection Pool
     let database: DatabaseConnection = DatabaseConnection {};

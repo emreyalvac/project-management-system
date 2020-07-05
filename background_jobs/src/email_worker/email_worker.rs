@@ -43,7 +43,7 @@ impl TEmailWorker for EmailWorker {
         let redis = Redis {};
         let mut redis_connection = redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
         // Response
-        let res = match redis_connection.lindex::<String, String>("queue::email_queue".to_owned(), 0) {
+        let _res = match redis_connection.lindex::<String, String>("queue::email_queue".to_owned(), 0) {
             Ok(response) => {
                 return Ok(self.proc(response).await.unwrap());
             }

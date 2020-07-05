@@ -1,4 +1,4 @@
-use actix_web::{get, post, web, HttpResponse, HttpRequest};
+use actix_web::{get, post, web, HttpResponse};
 use services::board_services::board::{BoardServices, TBoardServices};
 use domain::board::board_get_with_id::BoardGetWithId;
 use middlewares::auth::auth::AuthorizationService;

@@ -59,7 +59,7 @@ impl TBoardServices for BoardServices {
         let result = handler.execute().await;
         if result.status {
             let card_services = CardServices { client: self.client.to_owned() };
-            let card_insert_result = card_services.insert_card(card_clone).await;
+            let _card_insert_result = card_services.insert_card(card_clone).await;
             Ok(result)
         } else {
             Err(result)
@@ -68,7 +68,7 @@ impl TBoardServices for BoardServices {
 
     async fn get_board_users(&self, board: BoardGetWithId) -> Result<BoardUsersAggregate, NotFound> {
         let factory = BoardQueryHandlerFactory { client: self.client.to_owned() };
-        let mut handler = factory.build_for_get_board_users(GetBoardUsersQuery { board_id: board.board_id }).await;
+        let handler = factory.build_for_get_board_users(GetBoardUsersQuery { board_id: board.board_id }).await;
         let result = handler.get().await;
         match result {
             Ok(res) => {

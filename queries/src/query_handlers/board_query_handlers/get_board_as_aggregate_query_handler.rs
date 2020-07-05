@@ -5,7 +5,7 @@ use domain::aggregates::board_aggregate::BoardAggregate;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use mongodb::{bson::doc, Client};
 use domain::common::not_found::NotFound;
-use std::collections::HashMap;
+
 
 pub struct GetBoardAsAggregateQueryHandler {
     pub query: GetBoardAsAggregateQuery,

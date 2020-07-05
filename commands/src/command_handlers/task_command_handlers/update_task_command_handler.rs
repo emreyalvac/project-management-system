@@ -2,7 +2,7 @@ use crate::commands::task_commands::update_task_command::UpdateTaskCommand;
 use domain::command::command::TCommandHandler;
 use domain::common::command_response::CommandResponse;
 use async_trait::async_trait;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use mongodb::{bson::doc, Client};

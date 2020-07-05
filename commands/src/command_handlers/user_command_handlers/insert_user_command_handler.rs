@@ -17,7 +17,7 @@ impl TCommandHandler<InsertUserCommand, CommandResponse> for InsertUserCommandHa
     async fn execute(&mut self) -> CommandResponse {
         let connection = self.client.to_owned();
         let repository: GenericRepository = GenericRepository { collection: "users".to_owned(), connection };
-        let mut user_data = &mut self.command.user;
+        let user_data = &mut self.command.user;
         let result = repository.insert_generic::<Register>(user_data).await.unwrap();
         if result {
             CommandResponse { status: true, message: "User Insert".to_owned(), command_type: CommandType::UserInsert }

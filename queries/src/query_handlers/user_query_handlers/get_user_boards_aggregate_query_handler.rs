@@ -1,7 +1,7 @@
 use crate::queries::user_queries::get_user_boards_aggregate_query::GetUserBoardsAggregateQuery;
 use domain::query::query::TQueryHandler;
-use domain::board::board::Board;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+
+
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use mongodb::{bson::doc, Client};
 use async_trait::async_trait;

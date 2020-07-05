@@ -64,7 +64,7 @@ impl TRedis for Redis {
 
 #[cfg(test)]
 mod tests {
-    use tokio::io::AsyncWrite;
+    
     use super::*;
 
     #[tokio::test]

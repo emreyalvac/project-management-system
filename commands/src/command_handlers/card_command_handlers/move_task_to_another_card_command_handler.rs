@@ -2,7 +2,7 @@ use crate::commands::card_commands::move_task_to_another_card_command::MoveTaskT
 use domain::command::command::TCommandHandler;
 use domain::common::command_response::CommandResponse;
 use async_trait::async_trait;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use mongodb::{bson::doc, Client};
 use domain::common::command_type::CommandType;

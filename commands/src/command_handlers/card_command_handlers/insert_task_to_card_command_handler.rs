@@ -1,7 +1,7 @@
 use crate::commands::card_commands::insert_task_to_card_command::InsertTaskToCardCommand;
 use domain::command::command::TCommandHandler;
 use domain::common::command_response::CommandResponse;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use mongodb::{bson::doc, Client};

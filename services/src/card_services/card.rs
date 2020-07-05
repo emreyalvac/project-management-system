@@ -41,7 +41,7 @@ impl TCardServices for CardServices {
     async fn insert_task_to_card(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse> {
         let card_task = task.clone();
         let task_services = TaskServices { client: self.client.to_owned() };
-        let task_insert = task_services.insert_task(task).await;
+        let _task_insert = task_services.insert_task(task).await;
         let factory = CardCommandHandlerFactory { client: self.client.to_owned() };
         let mut handler = factory.build_for_insert_task_to_card(InsertTaskToCardCommand { task: card_task });
         let result = handler.execute().await;

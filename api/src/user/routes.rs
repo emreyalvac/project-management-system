@@ -4,14 +4,14 @@ use domain::user::login_user::LoginUser;
 use domain::user::register::Register;
 use futures::executor::block_on;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker, EmailJob};
-use std::sync::{Mutex, Arc, RwLock};
+use std::sync::{Arc, RwLock};
 use domain::user::user_get_by_id::UserGetById;
 use middlewares::auth::auth::AuthorizationService;
 use domain::user::insert_board_to_user::InsertBoardToUser;
 use helpers::token_decoder::token_decoder;
 use domain::common::claims::Claims;
 use domain::user::invite_user_to_board::InviteUserToBoard;
-use domain::user::get_by_email::GetByEmail;
+
 use domain::user::update_user::UpdateUser;
 use mongodb::Client;
 

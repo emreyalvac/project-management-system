@@ -1,7 +1,7 @@
 use crate::commands::board_commands::update_card_command::UpdateCardCommand;
 use domain::command::command::TCommandHandler;
 use domain::common::command_response::CommandResponse;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
+
 use async_trait::async_trait;
 use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};

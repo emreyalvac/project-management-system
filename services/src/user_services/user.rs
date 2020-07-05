@@ -17,12 +17,12 @@ use domain::common::command_response::CommandResponse;
 use domain::common::command_type::CommandType;
 use commands::factory::user_command_handler_factory::{UserCommandHandlerFactory, TUserCommandHandlerFactory};
 use commands::commands::user_commands::insert_user_command::InsertUserCommand;
-use uuid::Uuid;
+
 use domain::user::validate_user::ValidateUserClaims;
 use commands::commands::user_commands::validate_user_command::ValidateUserCommand;
 use domain::query::query::TQueryHandler;
 use domain::user::user_get_by_id::UserGetById;
-use domain::board::board::Board;
+
 use queries::queries::user_queries::get_user_boards_aggregate_query::GetUserBoardsAggregateQuery;
 use domain::aggregates::board_user_aggregate::BoardUserAggregate;
 use domain::user::insert_board_to_user::InsertBoardToUser;
@@ -88,7 +88,7 @@ impl TUserServices for UserServices {
                 sha.input_str(login.password.as_str());
                 if user.password == sha.result_str() {
                     let key = SECRET_KEY.as_bytes();
-                    let mut date: DateTime<Utc>;
+                    let date: DateTime<Utc>;
                     if login.remember_me {
                         date = Utc::now() + Duration::days(365)
                     } else {
@@ -194,7 +194,7 @@ impl TUserServices for UserServices {
             board_manager_user_id: insert_board.user_id,
             board_status: BoardStatus::InProgress,
         };
-        let board_execute = board_service.insert_board(board).await;
+        let _board_execute = board_service.insert_board(board).await;
         let mut handler = factory.build_for_insert_board(InsertBoardToUserCommand { user_board: cloned_board });
         let result = handler.execute().await;
         if result.status {
@@ -207,7 +207,7 @@ impl TUserServices for UserServices {
     async fn get_by_id(&self, user: UserGetById) -> Result<User, NotFound> {
         let client = self.client.to_owned();
         let factory = UserQueryHandlerFactory { client };
-        let mut handler = factory.build_for_get_by_id(UserGetByIdQuery { id: user.user_id }).await;
+        let handler = factory.build_for_get_by_id(UserGetByIdQuery { id: user.user_id }).await;
         let result = handler.get().await;
         match result {
             Ok(user) => {
