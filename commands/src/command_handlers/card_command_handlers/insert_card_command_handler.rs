@@ -6,33 +6,27 @@ use domain::common::command_type::CommandType;
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
 use async_trait::async_trait;
 use domain::board::insert_card_to_board::InsertCardToBoard;
+use mongodb::Client;
 
 pub struct InsertCardCommandHandler {
-    pub command: InsertCardCommand
+    pub command: InsertCardCommand,
+    pub client: Client,
 }
 
 #[async_trait]
 impl TCommandHandler<InsertCardCommand, CommandResponse> for InsertCardCommandHandler {
     async fn execute(&mut self) -> CommandResponse {
-        let database = DatabaseConnection {};
-        let connection = database.get_connection().await;
-        match connection {
-            Ok(client) => {
-                let repository = GenericRepository { connection: client, collection: "cards".to_owned() };
-                let card = self.command.card.clone();
-                let handler = repository.insert_generic::<InsertCardToBoard>(&card).await;
-                drop(card);
-                match handler {
-                    Ok(_) => {
-                        return CommandResponse { command_type: CommandType::InsertCard, message: "OK".to_owned(), status: true };
-                    }
-                    Err(_) => {
-                        return CommandResponse { command_type: CommandType::InsertCard, message: "Insert Failed".to_owned(), status: false };
-                    }
-                }
+        let connection = self.client.to_owned();
+        let repository = GenericRepository { connection, collection: "cards".to_owned() };
+        let card = self.command.card.clone();
+        let handler = repository.insert_generic::<InsertCardToBoard>(&card).await;
+        drop(card);
+        match handler {
+            Ok(_) => {
+                return CommandResponse { command_type: CommandType::InsertCard, message: "OK".to_owned(), status: true };
             }
             Err(_) => {
-                return CommandResponse { command_type: CommandType::InsertCard, message: "Connection Failed".to_owned(), status: false };
+                return CommandResponse { command_type: CommandType::InsertCard, message: "Insert Failed".to_owned(), status: false };
             }
         }
     }

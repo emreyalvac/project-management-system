@@ -11,6 +11,7 @@ use domain::card::move_task_to_another_card::MoveTaskToAnotherCard;
 use commands::commands::card_commands::move_task_to_another_card_command::MoveTaskToAnotherCardCommand;
 use domain::card::update_card::UpdateCard;
 use commands::commands::board_commands::update_card_command::UpdateCardCommand;
+use mongodb::Client;
 
 #[async_trait]
 pub trait TCardServices {
@@ -20,12 +21,14 @@ pub trait TCardServices {
     async fn update_card(&self, card: UpdateCard) -> Result<CommandResponse, CommandResponse>;
 }
 
-pub struct CardServices {}
+pub struct CardServices {
+    pub client: Client
+}
 
 #[async_trait]
 impl TCardServices for CardServices {
     async fn insert_card(&self, card: InsertCardToBoard) -> Result<CommandResponse, CommandResponse> {
-        let factory = CardCommandHandlerFactory {};
+        let factory = CardCommandHandlerFactory { client: self.client.to_owned() };
         let mut handler = factory.build_for_insert(InsertCardCommand { card });
         let result = handler.execute().await;
         if result.status {
@@ -37,9 +40,9 @@ impl TCardServices for CardServices {
 
     async fn insert_task_to_card(&self, task: InsertTask) -> Result<CommandResponse, CommandResponse> {
         let card_task = task.clone();
-        let task_services = TaskServices {};
+        let task_services = TaskServices { client: self.client.to_owned() };
         let task_insert = task_services.insert_task(task).await;
-        let factory = CardCommandHandlerFactory {};
+        let factory = CardCommandHandlerFactory { client: self.client.to_owned() };
         let mut handler = factory.build_for_insert_task_to_card(InsertTaskToCardCommand { task: card_task });
         let result = handler.execute().await;
         if result.status {
@@ -50,7 +53,7 @@ impl TCardServices for CardServices {
     }
 
     async fn move_task_to_another_card(&self, task: MoveTaskToAnotherCard) -> Result<CommandResponse, CommandResponse> {
-        let factory = CardCommandHandlerFactory {};
+        let factory = CardCommandHandlerFactory { client: self.client.to_owned() };
         let mut handler = factory.build_for_move_task_to_another_card(MoveTaskToAnotherCardCommand { task });
         let result = handler.execute().await;
         if result.status {
@@ -61,7 +64,7 @@ impl TCardServices for CardServices {
     }
 
     async fn update_card(&self, card: UpdateCard) -> Result<CommandResponse, CommandResponse> {
-        let factory = CardCommandHandlerFactory {};
+        let factory = CardCommandHandlerFactory { client: self.client.to_owned() };
         let mut handler = factory.build_for_update_card(UpdateCardCommand { card });
         let result = handler.execute().await;
         if result.status {

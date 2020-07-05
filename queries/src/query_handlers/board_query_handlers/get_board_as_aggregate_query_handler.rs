@@ -2,21 +2,20 @@ use async_trait::async_trait;
 use crate::queries::board_queries::get_boards_as_aggregate_query::GetBoardAsAggregateQuery;
 use domain::query::query::TQueryHandler;
 use domain::aggregates::board_aggregate::BoardAggregate;
-use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use data_access::generic_repository::generic_repository::{GenericRepository, TGenericRepository};
-use mongodb::{bson::doc};
+use mongodb::{bson::doc, Client};
 use domain::common::not_found::NotFound;
 use std::collections::HashMap;
 
 pub struct GetBoardAsAggregateQueryHandler {
-    pub query: GetBoardAsAggregateQuery
+    pub query: GetBoardAsAggregateQuery,
+    pub client: Client,
 }
 
 #[async_trait]
 impl TQueryHandler<GetBoardAsAggregateQuery, BoardAggregate, NotFound> for GetBoardAsAggregateQueryHandler {
     async fn get(&self) -> Result<BoardAggregate, NotFound> {
-        let database = DatabaseConnection {};
-        let connection = database.get_connection().await.ok().unwrap();
+        let connection = self.client.to_owned();
         let repository: GenericRepository = GenericRepository { collection: "boards".to_owned(), connection };
         let board_id = &self.query.board_id;
         let query_1 = doc! {"$match": {"board_id": board_id.as_str()}};

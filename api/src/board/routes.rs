@@ -12,10 +12,15 @@ use services::task_services::task::{TaskServices, TTaskServices};
 use domain::task::delete_task::DeleteTask;
 use domain::task::assign_task_to_user::AssignTaskToUser;
 use domain::task::delete_assigned_user_from_task::DeleteAssignedUserFromTask;
+use std::sync::RwLock;
+use mongodb::Client;
 
 #[get("/{id}")]
-async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpResponse {
-    let services = BoardServices {};
+async fn get_boards(id: web::Path<String>, _: AuthorizationService, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = BoardServices { client };
     let result = services.get_board_as_aggregate(BoardGetWithId { board_id: id.into_inner() }).await;
     match result {
         Ok(res) => HttpResponse::Ok().json(res),
@@ -24,8 +29,11 @@ async fn get_boards(id: web::Path<String>, _: AuthorizationService) -> HttpRespo
 }
 
 #[post("/createCard")]
-async fn board_create_card(card: web::Json<InsertCardToBoard>, _: AuthorizationService) -> HttpResponse {
-    let board_services = BoardServices {};
+async fn board_create_card(card: web::Json<InsertCardToBoard>, _: AuthorizationService, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let board_services = BoardServices { client };
     let result = board_services.insert_card_to_board(card.into_inner()).await;
     match result {
         Ok(res) => {
@@ -38,8 +46,11 @@ async fn board_create_card(card: web::Json<InsertCardToBoard>, _: AuthorizationS
 }
 
 #[post("/card/createTask")]
-async fn insert_task_to_card(task: web::Json<InsertTask>, _: AuthorizationService) -> HttpResponse {
-    let services = CardServices {};
+async fn insert_task_to_card(task: web::Json<InsertTask>, _: AuthorizationService, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = CardServices { client };
     let result = services.insert_task_to_card(task.into_inner()).await;
     match result {
         Ok(res) => {
@@ -52,8 +63,11 @@ async fn insert_task_to_card(task: web::Json<InsertTask>, _: AuthorizationServic
 }
 
 #[post("/card/moveTaskToAnotherCard")]
-async fn move_task_to_another_card(task: web::Json<MoveTaskToAnotherCard>, _: AuthorizationService) -> HttpResponse {
-    let services = CardServices {};
+async fn move_task_to_another_card(task: web::Json<MoveTaskToAnotherCard>, _: AuthorizationService, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = CardServices { client };
     let result = services.move_task_to_another_card(task.into_inner()).await;
     match result {
         Ok(res) => {
@@ -66,8 +80,11 @@ async fn move_task_to_another_card(task: web::Json<MoveTaskToAnotherCard>, _: Au
 }
 
 #[post("/getBoardUsers")]
-async fn get_board_users(_: AuthorizationService, board: web::Json<BoardGetWithId>) -> HttpResponse {
-    let services = BoardServices {};
+async fn get_board_users(_: AuthorizationService, board: web::Json<BoardGetWithId>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = BoardServices { client };
     let result = services.get_board_users(board.into_inner()).await;
     match result {
         Ok(res) => {
@@ -80,8 +97,11 @@ async fn get_board_users(_: AuthorizationService, board: web::Json<BoardGetWithI
 }
 
 #[post("/card/updateCard")]
-async fn update_card(_: AuthorizationService, card: web::Json<UpdateCard>) -> HttpResponse {
-    let services = CardServices {};
+async fn update_card(_: AuthorizationService, card: web::Json<UpdateCard>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = CardServices { client };
     let result = services.update_card(card.into_inner()).await;
     match result {
         Ok(res) => {
@@ -94,8 +114,11 @@ async fn update_card(_: AuthorizationService, card: web::Json<UpdateCard>) -> Ht
 }
 
 #[post("/task/updateTask")]
-async fn update_task(_: AuthorizationService, task: web::Json<UpdateTask>) -> HttpResponse {
-    let services = TaskServices {};
+async fn update_task(_: AuthorizationService, task: web::Json<UpdateTask>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = TaskServices { client };
     let result = services.update_task(task.into_inner()).await;
     match result {
         Ok(res) => {
@@ -108,8 +131,11 @@ async fn update_task(_: AuthorizationService, task: web::Json<UpdateTask>) -> Ht
 }
 
 #[post("/task/deleteTask")]
-async fn delete_task(_: AuthorizationService, task: web::Json<DeleteTask>) -> HttpResponse {
-    let services = TaskServices {};
+async fn delete_task(_: AuthorizationService, task: web::Json<DeleteTask>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = TaskServices { client };
     let result = services.delete_task(task.into_inner()).await;
     match result {
         Ok(res) => {
@@ -122,8 +148,11 @@ async fn delete_task(_: AuthorizationService, task: web::Json<DeleteTask>) -> Ht
 }
 
 #[post("/task/assignTaskToUser")]
-async fn assign_task_to_user(_: AuthorizationService, task: web::Json<AssignTaskToUser>) -> HttpResponse {
-    let services = TaskServices {};
+async fn assign_task_to_user(_: AuthorizationService, task: web::Json<AssignTaskToUser>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = TaskServices { client };
     let result = services.assign_task_to_user(task.into_inner()).await;
     match result {
         Ok(res) => {
@@ -136,8 +165,11 @@ async fn assign_task_to_user(_: AuthorizationService, task: web::Json<AssignTask
 }
 
 #[post("/task/deleteAssignedUserFromTask")]
-async fn delete_assigned_user_from_task(_: AuthorizationService, task: web::Json<DeleteAssignedUserFromTask>) -> HttpResponse {
-    let services = TaskServices {};
+async fn delete_assigned_user_from_task(_: AuthorizationService, task: web::Json<DeleteAssignedUserFromTask>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+    // Database
+    let lock_database = database.read().unwrap();
+    let client = lock_database.to_owned();
+    let services = TaskServices { client };
     let result = services.delete_assigned_user_from_task(task.into_inner()).await;
     match result {
         Ok(res) => {

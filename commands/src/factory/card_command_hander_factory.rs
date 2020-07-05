@@ -6,6 +6,7 @@ use crate::commands::card_commands::move_task_to_another_card_command::MoveTaskT
 use crate::command_handlers::card_command_handlers::move_task_to_another_card_command_handler::MoveTaskToAnotherCardCommandHandler;
 use crate::commands::board_commands::update_card_command::UpdateCardCommand;
 use crate::command_handlers::card_command_handlers::update_card_command_handler::UpdateCardCommandHandler;
+use mongodb::Client;
 
 pub trait TCardCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertCardCommand) -> InsertCardCommandHandler;
@@ -14,22 +15,24 @@ pub trait TCardCommandHandlerFactory {
     fn build_for_update_card(&self, command: UpdateCardCommand) -> UpdateCardCommandHandler;
 }
 
-pub struct CardCommandHandlerFactory {}
+pub struct CardCommandHandlerFactory {
+    pub client: Client
+}
 
 impl TCardCommandHandlerFactory for CardCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertCardCommand) -> InsertCardCommandHandler {
-        InsertCardCommandHandler { command }
+        InsertCardCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_insert_task_to_card(&self, command: InsertTaskToCardCommand) -> InsertTaskToCardCommandHandler {
-        InsertTaskToCardCommandHandler { command }
+        InsertTaskToCardCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_move_task_to_another_card(&self, command: MoveTaskToAnotherCardCommand) -> MoveTaskToAnotherCardCommandHandler {
-        MoveTaskToAnotherCardCommandHandler { command }
+        MoveTaskToAnotherCardCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_update_card(&self, command: UpdateCardCommand) -> UpdateCardCommandHandler {
-        UpdateCardCommandHandler { command }
+        UpdateCardCommandHandler { command, client: self.client.to_owned() }
     }
 }

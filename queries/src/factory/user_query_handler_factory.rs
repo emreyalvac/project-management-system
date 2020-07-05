@@ -24,19 +24,18 @@ pub struct UserQueryHandlerFactory {
 #[async_trait]
 impl TUserQueryHandlerFactory for UserQueryHandlerFactory {
     async fn build_for_email(&self, query: UserGetByEmailQuery) -> UserGetByEmailQueryHandler {
-        let client = self.client.to_owned();
-        UserGetByEmailQueryHandler { query, client }
+        UserGetByEmailQueryHandler { query, client: self.client.to_owned() }
     }
 
     async fn build_for_boards(&self, query: GetUserBoardsAggregateQuery) -> GetUserBoardsAggregateQueryHandler {
-        GetUserBoardsAggregateQueryHandler { query }
+        GetUserBoardsAggregateQueryHandler { query, client: self.client.to_owned() }
     }
 
     async fn build_for_get_by_id(&self, query: UserGetByIdQuery) -> UserGetByIdQueryHandler {
-        UserGetByIdQueryHandler { query }
+        UserGetByIdQueryHandler { query, client: self.client.to_owned() }
     }
 
     async fn build_for_check_user_board(&self, query: CheckUserBoardQuery) -> CheckUserBoardQueryHandler {
-        CheckUserBoardQueryHandler { query }
+        CheckUserBoardQueryHandler { query, client: self.client.to_owned() }
     }
 }

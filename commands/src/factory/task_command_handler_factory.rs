@@ -8,6 +8,7 @@ use crate::commands::task_commands::assign_task_to_user_command::AssignTaskToUse
 use crate::command_handlers::task_command_handlers::assign_task_to_user_command_handler::AssignTaskToUserCommandHandler;
 use crate::commands::task_commands::delete_assigned_user_from_task_command::DeleteAssignedUserFromTaskCommand;
 use crate::command_handlers::task_command_handlers::delete_assigned_user_from_task_command_handler::DeleteAssignedUserFromTaskCommandHandler;
+use mongodb::Client;
 
 pub trait TTaskCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertTaskCommand) -> InsertTaskCommandHandler;
@@ -17,26 +18,28 @@ pub trait TTaskCommandHandlerFactory {
     fn build_for_delete_assigned_user_from_task(&self, command: DeleteAssignedUserFromTaskCommand) -> DeleteAssignedUserFromTaskCommandHandler;
 }
 
-pub struct TaskCommandHandlerFactory {}
+pub struct TaskCommandHandlerFactory {
+    pub client: Client
+}
 
 impl TTaskCommandHandlerFactory for TaskCommandHandlerFactory {
     fn build_for_insert(&self, command: InsertTaskCommand) -> InsertTaskCommandHandler {
-        InsertTaskCommandHandler { command }
+        InsertTaskCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_update(&self, command: UpdateTaskCommand) -> UpdateTaskCommandHandler {
-        UpdateTaskCommandHandler { command }
+        UpdateTaskCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_delete(&self, command: DeleteTaskCommand) -> DeleteTaskCommandHandler {
-        DeleteTaskCommandHandler { command }
+        DeleteTaskCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_assign_task_to_user(&self, command: AssignTaskToUserCommand) -> AssignTaskToUserCommandHandler {
-        AssignTaskToUserCommandHandler { command }
+        AssignTaskToUserCommandHandler { command, client: self.client.to_owned() }
     }
 
     fn build_for_delete_assigned_user_from_task(&self, command: DeleteAssignedUserFromTaskCommand) -> DeleteAssignedUserFromTaskCommandHandler {
-        DeleteAssignedUserFromTaskCommandHandler { command }
+        DeleteAssignedUserFromTaskCommandHandler { command, client: self.client.to_owned() }
     }
 }

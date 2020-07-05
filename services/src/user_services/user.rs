@@ -182,8 +182,9 @@ impl TUserServices for UserServices {
 
     async fn insert_board(&self, board: InsertBoardToUser) -> Result<CommandResponse, CommandResponse> {
         let client = self.client.to_owned();
+        let client_clone = self.client.clone();
         let factory = UserCommandHandlerFactory { client };
-        let board_service = BoardServices {};
+        let board_service = BoardServices { client: client_clone };
         let cloned_board = board.clone();
         let insert_board = board.clone();
         let board = InsertableBoard {
