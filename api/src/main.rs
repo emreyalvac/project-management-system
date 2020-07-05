@@ -34,7 +34,7 @@ async fn email_worker_process() {
 async fn main() -> Result<()> {
     // Create Email Worker
     let worker = EmailWorker {};
-    let email_worker = web::Data::new(Arc::new(Mutex::new(worker)));
+    let email_worker = web::Data::new(Arc::new(RwLock::new(worker)));
 
     // Create Redis Pool (Mutex)
     let redis_pool = web::Data::new(Mutex::new(Redis {}));

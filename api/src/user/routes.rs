@@ -33,7 +33,7 @@ async fn login(user: web::Json<LoginUser>, database: web::Data<RwLock<Client>>) 
 }
 
 #[post("/register")]
-async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<EmailWorker>>>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+async fn register(register: web::Json<Register>, email_job: web::Data<Arc<RwLock<EmailWorker>>>, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let into = register.into_inner();
     let cloned = into.clone();
     let lock_database = database.read().unwrap();
@@ -45,9 +45,13 @@ async fn register(register: web::Json<Register>, email_job: web::Data<Arc<Mutex<
             // Email Validation
             let cloned = into.clone();
             std::thread::spawn(move || {
-                let worker = email_job.lock().unwrap();
+                let worker = email_job.read().unwrap();
                 let validate = block_on(services.generate_token_for_validation(into));
-                block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Merhabalar, <br/><br/> Üye olduğunuz için teşekkürler. Üyeliğinizi onaylamak için <a href=\"http://localhost:3000/validate/{}\">tıklayınız</a>", validate), subject: "Üyelik Onaylama".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+                let register_email_validation_result = block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Merhabalar, <br/><br/> Üye olduğunuz için teşekkürler. Üyeliğinizi onaylamak için <a href=\"http://localhost:3000/validate/{}\">tıklayınız</a>", validate), subject: "Üyelik Onaylama".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+                match register_email_validation_result {
+                    Ok(_) => {}
+                    Err(_) => {}
+                }
             });
             HttpResponse::Ok().json(res)
         }
@@ -133,14 +137,14 @@ async fn get_user_informations(_: AuthorizationService, req: HttpRequest, databa
 }
 
 #[post("/inviteUserToBoard")]
-async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<Mutex<EmailWorker>>>, invite: web::Json<InviteUserToBoard>, database: web::Data<RwLock<Client>>) -> HttpResponse {
+async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<RwLock<EmailWorker>>>, invite: web::Json<InviteUserToBoard>, database: web::Data<RwLock<Client>>) -> HttpResponse {
     let lock_database = database.read().unwrap();
     let client = lock_database.to_owned();
     let services = UserServices { client };
     let inner_invite = invite.into_inner();
     match services.invite_user_with_email(inner_invite).await {
         Ok(response) => {
-            let worker = email_job.lock().unwrap();
+            let worker = email_job.read().unwrap();
             let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Merhabalar, <br/><br/> Yeni bir panoya davet edildiniz. Daveti kabul etmek için <a href=\"http://localhost:3000/invite/{}\">tıklayınız</a>", response.token), subject: "Pano Daveti".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
             match email_result {
                 Ok(_) => {
