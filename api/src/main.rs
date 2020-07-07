@@ -42,6 +42,7 @@ async fn main() -> Result<()> {
     // Database Connection Pool
     let database: DatabaseConnection = DatabaseConnection {};
     let connection = database.get_connection().await.ok().unwrap();
+    let cloned_connection = connection.clone();
     // Mutex only one thread at the same time
     // RwLock many reader, only one writer
     let database_pool: web::Data<RwLock<Client>> = web::Data::new(RwLock::new(connection));

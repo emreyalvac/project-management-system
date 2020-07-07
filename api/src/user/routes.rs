@@ -47,7 +47,7 @@ async fn register(register: web::Json<Register>, email_job: web::Data<Arc<RwLock
             std::thread::spawn(move || {
                 let worker = email_job.read().unwrap();
                 let validate = block_on(services.generate_token_for_validation(into));
-                let register_email_validation_result = block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Merhabalar, <br/><br/> Üye olduğunuz için teşekkürler. Üyeliğinizi onaylamak için <a href=\"http://localhost:3000/validate/{}\">tıklayınız</a>", validate), subject: "Üyelik Onaylama".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+                let register_email_validation_result = block_on(worker.enqueue(EmailJob { to: cloned.email, message: format!("Merhabalar, <br/><br/> Üye olduğunuz için teşekkürler. Üyeliğinizi onaylamak için <a href=\"https://project.yaraticibisi.com/validate/{}\">tıklayınız</a>", validate), subject: "Üyelik Onaylama".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
                 match register_email_validation_result {
                     Ok(_) => {}
                     Err(_) => {}
@@ -145,7 +145,7 @@ async fn invite_user_to_board(_: AuthorizationService, email_job: web::Data<Arc<
     match services.invite_user_with_email(inner_invite).await {
         Ok(response) => {
             let worker = email_job.read().unwrap();
-            let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Merhabalar, <br/><br/> Yeni bir panoya davet edildiniz. Daveti kabul etmek için <a href=\"http://localhost:3000/invite/{}\">tıklayınız</a>", response.token), subject: "Pano Daveti".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
+            let email_result = block_on(worker.enqueue(EmailJob { to: response.email, message: format!("Merhabalar, <br/><br/> Yeni bir panoya davet edildiniz. Daveti kabul etmek için <a href=\"https://project.yaraticibisi.com/invite/{}\">tıklayınız</a>", response.token), subject: "Pano Daveti".to_owned(), iterate: 1, class: "EmailClass".to_owned() }));
             match email_result {
                 Ok(_) => {
                     HttpResponse::Ok().json(true)
