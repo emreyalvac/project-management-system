@@ -3,8 +3,7 @@ use actix_web::{HttpServer, App, web};
 use futures::executor::block_on;
 use std::time::Duration;
 use background_jobs::email_worker::email_worker::{EmailWorker, TEmailWorker};
-use cache::redis::redis::Redis;
-use std::sync::{Mutex, Arc, RwLock};
+use std::sync::{Arc, RwLock};
 use actix_cors::Cors;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use mongodb::Client;
@@ -19,30 +18,28 @@ async fn email_worker_process() {
     loop {
         match worker.reserve().await {
             Ok(_) => {
-                println!("Job reserved..");
+                // println!("Job reserved..");
             }
             Err(_) => {
-                println!("Any job not found.");
+                // println!("Any job not found.");
             }
         };
-        println!("Checking jobs..");
+        // println!("Checking jobs..");
         std::thread::sleep(Duration::from_millis(3000));
     }
 }
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
+    // Create Redis Pool (Mutex)
+
     // Create Email Worker
     let worker = EmailWorker {};
     let email_worker = web::Data::new(Arc::new(RwLock::new(worker)));
 
-    // Create Redis Pool (Mutex)
-    let _redis_pool = web::Data::new(Mutex::new(Redis {}));
-
     // Database Connection Pool
     let database: DatabaseConnection = DatabaseConnection {};
     let connection = database.get_connection().await.ok().unwrap();
-    let cloned_connection = connection.clone();
     // Mutex only one thread at the same time
     // RwLock many reader, only one writer
     let database_pool: web::Data<RwLock<Client>> = web::Data::new(RwLock::new(connection));
@@ -65,7 +62,7 @@ async fn main() -> Result<()> {
             .wrap(Cors::new().supports_credentials().finish())
     })
         .keep_alive(Some(75))
-        .bind("127.0.0.1:5004").unwrap()
+        .bind("127.0.0.1:4000").unwrap()
         .run()
         .await
 }

@@ -64,7 +64,6 @@ impl TRedis for Redis {
 
 #[cfg(test)]
 mod tests {
-    
     use super::*;
 
     #[tokio::test]

@@ -12,3 +12,6 @@ members = [
     "middlewares",
     "helpers"
 ]
+
+[profile.release]
+opt-level = 3
