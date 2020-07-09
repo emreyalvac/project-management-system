@@ -41,7 +41,10 @@ impl TEmail for Email {
         let result = mailer.send(&email);
         match result {
             Ok(_) => Ok(true),
-            Err(_) => Err(false)
+            Err(e) => {
+                println!("Email Send Error {:?}", e);
+                Err(false)
+            }
         }
     }
 }
