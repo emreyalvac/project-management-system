@@ -1,4 +1,3 @@
-
 use lettre::{SmtpTransport, Transport, Message};
 
 use std::env;
@@ -49,7 +48,6 @@ impl TEmail for Email {
 
 #[cfg(test)]
 mod tests {
-    
     use super::*;
 
     #[tokio::test]

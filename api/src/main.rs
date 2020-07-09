@@ -31,7 +31,9 @@ async fn email_worker_process() {
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
-    // Create Redis Pool (Mutex)
+    // Set ENV
+    std::env::set_var("GMAIL_USERNAME", "rusttestemail12@gmail.com");
+    std::env::set_var("GMAIL_PASSWORD", "rusttest123");
 
     // Create Email Worker
     let worker = EmailWorker {};
