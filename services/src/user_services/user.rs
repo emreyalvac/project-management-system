@@ -17,12 +17,10 @@ use domain::common::command_response::CommandResponse;
 use domain::common::command_type::CommandType;
 use commands::factory::user_command_handler_factory::{UserCommandHandlerFactory, TUserCommandHandlerFactory};
 use commands::commands::user_commands::insert_user_command::InsertUserCommand;
-
 use domain::user::validate_user::ValidateUserClaims;
 use commands::commands::user_commands::validate_user_command::ValidateUserCommand;
 use domain::query::query::TQueryHandler;
 use domain::user::user_get_by_id::UserGetById;
-
 use queries::queries::user_queries::get_user_boards_aggregate_query::GetUserBoardsAggregateQuery;
 use domain::aggregates::board_user_aggregate::BoardUserAggregate;
 use domain::user::insert_board_to_user::InsertBoardToUser;
