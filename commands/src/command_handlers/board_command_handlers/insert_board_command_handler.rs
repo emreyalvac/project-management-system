@@ -19,13 +19,13 @@ impl TCommandHandler<InsertBoardCommand, CommandResponse> for InsertBoardCommand
         let connection = self.client.to_owned();
         let repository: GenericRepository = GenericRepository { collection: "boards".to_owned(), connection };
         let result = repository.insert_generic::<InsertableBoard>(&self.command.board).await;
-        match result {
+        return match result {
             Ok(_) => {
-                return CommandResponse { status: true, message: "OK".to_owned(), command_type: CommandType::InsertBoard };
+                CommandResponse { status: true, message: "OK".to_owned(), command_type: CommandType::InsertBoard }
             }
             Err(_) => {
-                return CommandResponse { message: "Insert Failed".to_owned(), status: false, command_type: CommandType::InsertBoard };
+                CommandResponse { message: "Insert Failed".to_owned(), status: false, command_type: CommandType::InsertBoard }
             }
-        }
+        };
     }
 }

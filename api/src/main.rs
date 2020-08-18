@@ -7,14 +7,16 @@ use std::sync::{Arc, RwLock};
 use actix_cors::Cors;
 use data_access::database::database_connection::{DatabaseConnection, TDatabaseConnection};
 use mongodb::Client;
+use cache::redis::redis::Redis;
+
 
 // Mod
 mod user;
 mod board;
 
 // Email Worker
-async fn email_worker_process() {
-    let worker = EmailWorker {};
+async fn email_worker_process(redis: Redis) {
+    let worker = EmailWorker {redis};
     loop {
         match worker.reserve().await {
             Ok(_) => {
@@ -31,12 +33,13 @@ async fn email_worker_process() {
 
 #[actix_rt::main]
 async fn main() -> Result<()> {
-    // Set ENV
-    std::env::set_var("GMAIL_USERNAME", "rusttestemail12@gmail.com");
-    std::env::set_var("GMAIL_PASSWORD", "rusttest123");
+
+    // Redis Pool
+    let redis = Redis {};
+    let clone_redis = redis.clone();
 
     // Create Email Worker
-    let worker = EmailWorker {};
+    let worker = EmailWorker { redis: clone_redis };
     let email_worker = web::Data::new(Arc::new(RwLock::new(worker)));
 
     // Database Connection Pool
@@ -46,8 +49,9 @@ async fn main() -> Result<()> {
     // RwLock many reader, only one writer
     let database_pool: web::Data<RwLock<Client>> = web::Data::new(RwLock::new(connection));
 
-    std::thread::spawn(|| {
-        let worker_fn = email_worker_process();
+
+    std::thread::spawn(move || {
+        let worker_fn = email_worker_process(redis);
         block_on(worker_fn);
     });
 

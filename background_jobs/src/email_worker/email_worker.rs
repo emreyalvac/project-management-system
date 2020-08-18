@@ -23,13 +23,14 @@ pub trait TEmailWorker {
 
 // TODO: Take redis from actix_web app_data
 #[derive(Debug)]
-pub struct EmailWorker {}
+pub struct EmailWorker {
+    pub redis: Redis
+}
 
 #[async_trait]
 impl TEmailWorker for EmailWorker {
     async fn enqueue(&self, job: EmailJob) -> Result<bool, bool> {
-        let redis = Redis {};
-        let mut redis_connection = redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
+        let mut redis_connection = self.redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
         let json_job = serde_json::to_string(&job).unwrap();
         let result = redis_connection.rpush::<String, String, Value>("queue::email_queue".to_owned(), json_job);
         println!("Enqueued Job -> {:?}", job);
@@ -40,8 +41,7 @@ impl TEmailWorker for EmailWorker {
     }
 
     async fn reserve(&self) -> Result<bool, bool> {
-        let redis = Redis {};
-        let mut redis_connection = redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
+        let mut redis_connection = self.redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
         // Response
         let _res = match redis_connection.lindex::<String, String>("queue::email_queue".to_owned(), 0) {
             Ok(response) => {
@@ -52,8 +52,7 @@ impl TEmailWorker for EmailWorker {
     }
 
     async fn proc(&self, json_job: String) -> Result<bool, bool> {
-        let redis = Redis {};
-        let mut redis_connection = redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
+        let mut redis_connection = self.redis.get_connection("redis://127.0.0.1".to_owned()).await.unwrap();
         let email = Email {};
         let mut job = serde_json::from_str::<EmailJob>(json_job.as_str()).unwrap();
         let send = email.send_email(EmailSend { from: "rusttestemail12@gmail.com".to_owned(), to: (&job.to).parse().unwrap(), body: (&job.message).parse().unwrap(), subject: (&job.subject).parse().unwrap() }).await;

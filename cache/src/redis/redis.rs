@@ -9,6 +9,7 @@ pub trait TRedis {
     async fn delete(&self, key: String) -> Result<bool, bool>;
 }
 
+#[derive(Clone, Debug)]
 pub struct Redis {}
 
 #[async_trait]
